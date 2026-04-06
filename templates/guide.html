@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ guide.title }} — מדריכי AI</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d0d0d; --card: #1a1a1a; --card2: #222;
+  --border: #2a2a2a; --accent: #6c63ff; --accent2: #8b85ff;
+  --text: #f0f0f0; --sub: #888;
+}
+body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', Arial, sans-serif; min-height: 100vh; }
+
+header {
+  background: linear-gradient(135deg, #111 0%, #1a1030 100%);
+  border-bottom: 2px solid var(--accent);
+  padding: 16px 32px;
+  display: flex; align-items: center; gap: 20px;
+  position: sticky; top: 0; z-index: 100;
+}
+.back-btn {
+  color: var(--sub); text-decoration: none; font-size: 0.9rem;
+  display: flex; align-items: center; gap: 6px; transition: .2s;
+}
+.back-btn:hover { color: var(--accent); }
+.logo { font-size: 1.2rem; font-weight: 800; color: var(--accent); }
+
+.hero {
+  width: 100%; max-height: 420px; overflow: hidden;
+  background: linear-gradient(135deg, #1a1030, #0d0d20);
+  display: flex; align-items: center; justify-content: center;
+}
+.hero img { width: 100%; max-height: 420px; object-fit: cover; display: block; }
+.hero-placeholder { font-size: 5rem; padding: 60px; }
+
+main { max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
+.guide-title { font-size: 2rem; font-weight: 800; margin-bottom: 12px; line-height: 1.3; }
+.guide-meta { color: var(--sub); font-size: 0.85rem; margin-bottom: 32px; }
+
+.guide-content {
+  font-size: 1rem; line-height: 1.9; color: #e0e0e0;
+  margin-bottom: 40px;
+}
+.guide-content h1,.guide-content h2,.guide-content h3 { color: var(--text); margin: 24px 0 12px; }
+.guide-content p { margin-bottom: 16px; }
+.guide-content a { color: var(--accent); }
+.guide-content img { max-width: 100%; border-radius: 8px; margin: 12px 0; }
+.guide-content pre { background: #111; border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 0.85rem; margin: 16px 0; }
+.guide-content code { background: #222; padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; }
+.guide-content blockquote { border-right: 3px solid var(--accent); padding-right: 16px; color: var(--sub); margin: 16px 0; }
+
+/* Files */
+.section-title { font-size: 1.1rem; font-weight: 700; color: var(--sub); margin-bottom: 16px; border-right: 3px solid var(--accent); padding-right: 12px; }
+.files-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 40px; }
+.file-item {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 18px; display: flex; align-items: center; gap: 14px;
+  text-decoration: none; color: inherit; transition: .2s;
+}
+.file-item:hover { border-color: var(--accent); background: #1f1f30; }
+.file-icon { font-size: 1.5rem; flex-shrink: 0; }
+.file-name { font-size: 0.9rem; font-weight: 600; flex: 1; }
+.file-size { font-size: 0.75rem; color: var(--sub); }
+.file-dl { font-size: 0.8rem; color: var(--accent); }
+
+/* Reactions */
+.reactions-section { margin-top: 16px; }
+.reactions-bar {
+  display: flex; gap: 12px; flex-wrap: wrap; padding: 24px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+}
+.react-btn {
+  background: var(--card2); border: 1px solid var(--border); border-radius: 24px;
+  padding: 8px 18px; font-size: 1.1rem; cursor: pointer; transition: .15s;
+  display: flex; align-items: center; gap: 8px; color: var(--text);
+}
+.react-btn:hover { border-color: var(--accent); background: #1f1f30; transform: scale(1.05); }
+.react-btn.active { border-color: var(--accent); background: rgba(108,99,255,.15); }
+.react-btn .cnt { font-size: 0.85rem; color: var(--sub); min-width: 16px; }
+
+.toast {
+  position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+  background: var(--accent); color: #fff; padding: 10px 24px; border-radius: 20px;
+  font-size: 0.9rem; opacity: 0; transition: opacity .3s; pointer-events: none;
+  z-index: 999;
+}
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<header>
+  <a class="back-btn" href="/">← חזרה</a>
+  <div class="logo">🤖 מדריכי AI</div>
+</header>
+
+{% if guide.cover_image %}
+<div class="hero"><img src="/files/{{ guide.cover_image }}" alt="{{ guide.title }}"></div>
+{% else %}
+<div class="hero"><div class="hero-placeholder">🤖</div></div>
+{% endif %}
+
+<main>
+  <h1 class="guide-title">{{ guide.title }}</h1>
+  <div class="guide-meta">פורסם: {{ guide.created_at[:10] }}</div>
+
+  <div class="guide-content">{{ guide.description | safe }}</div>
+
+  {% if files %}
+  <div class="section-title">קבצים להורדה ({{ files|length }})</div>
+  <div class="files-list">
+    {% for f in files %}
+    <a class="file-item" href="/files/{{ f.stored_name }}" download="{{ f.original_name }}">
+      <span class="file-icon">{{ get_file_icon(f.original_name) }}</span>
+      <span class="file-name">{{ f.original_name }}</span>
+      <span class="file-size">{{ f.file_size | fmt_size }}</span>
+      <span class="file-dl">⬇ הורדה</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="reactions-section">
+    <div class="section-title">תגובות</div>
+    <div class="reactions-bar" id="reactionsBar">
+      {% for emoji in allowed_emojis %}
+      <button class="react-btn" data-emoji="{{ emoji }}" onclick="react('{{ emoji }}')">
+        <span>{{ emoji }}</span>
+        <span class="cnt" id="cnt-{{ loop.index }}">{{ reactions.get(emoji, 0) }}</span>
+      </button>
+      {% endfor %}
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const guideId = {{ guide.id }};
+const myReactions = new Set(JSON.parse(localStorage.getItem('reactions_' + guideId) || '[]'));
+
+document.querySelectorAll('.react-btn').forEach(btn => {
+  if (myReactions.has(btn.dataset.emoji)) btn.classList.add('active');
+});
+
+async function react(emoji) {
+  const res = await fetch(`/guide/${guideId}/react`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({emoji})
+  });
+  const data = await res.json();
+  const btn = document.querySelector(`[data-emoji="${emoji}"]`);
+  const cnt = btn.querySelector('.cnt');
+  cnt.textContent = data.count;
+  if (data.action === 'added') {
+    btn.classList.add('active');
+    myReactions.add(emoji);
+    showToast(emoji + ' תודה!');
+  } else {
+    btn.classList.remove('active');
+    myReactions.delete(emoji);
+  }
+  localStorage.setItem('reactions_' + guideId, JSON.stringify([...myReactions]));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+</script>
+</body>
+</html>

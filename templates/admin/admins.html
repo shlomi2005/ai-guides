@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ניהול אדמינים</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+:root { --bg:#0d0d0d; --card:#1a1a1a; --card2:#222; --border:#2a2a2a; --accent:#6c63ff; --text:#f0f0f0; --sub:#888; }
+body { background:var(--bg); color:var(--text); font-family:'Segoe UI',Arial,sans-serif; min-height:100vh; }
+header { background:linear-gradient(135deg,#111,#1a1030); border-bottom:2px solid var(--accent); padding:16px 32px; display:flex; align-items:center; gap:20px; }
+.back { color:var(--sub); text-decoration:none; font-size:0.9rem; }
+.back:hover { color:var(--accent); }
+.logo { font-size:1.2rem; font-weight:800; color:var(--accent); }
+main { max-width:700px; margin:0 auto; padding:40px 20px; }
+.page-title { font-size:1.5rem; font-weight:800; margin-bottom:32px; }
+.admin-row { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:16px; margin-bottom:10px; }
+.admin-name { flex:1; font-weight:700; }
+.admin-role { font-size:0.75rem; padding:3px 10px; border-radius:10px; }
+.role-super { background:rgba(108,99,255,.15); color:var(--accent); border:1px solid rgba(108,99,255,.3); }
+.role-admin { background:var(--card2); color:var(--sub); border:1px solid var(--border); }
+.btn-remove { background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.2); color:#f87171; border-radius:8px; padding:6px 14px; font-size:0.8rem; cursor:pointer; }
+.btn-remove:hover { background:rgba(239,68,68,.2); }
+.add-form { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px; margin-top:32px; }
+.add-form h3 { margin-bottom:20px; font-size:1rem; color:var(--sub); }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+input[type=text], input[type=password] {
+  width:100%; background:#111; border:1px solid var(--border); border-radius:8px;
+  padding:10px 14px; color:var(--text); font-size:0.9rem; outline:none; transition:.2s;
+}
+input:focus { border-color:var(--accent); }
+.toggle-group { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.toggle { position:relative; width:44px; height:24px; }
+.toggle input { opacity:0; width:0; height:0; }
+.slider { position:absolute; inset:0; background:#333; border-radius:12px; cursor:pointer; transition:.2s; }
+.slider:before { content:''; position:absolute; width:18px; height:18px; bottom:3px; right:3px; background:#fff; border-radius:50%; transition:.2s; }
+.toggle input:checked + .slider { background:var(--accent); }
+.toggle input:checked + .slider:before { transform:translateX(-20px); }
+.btn-add { background:var(--accent); border:none; border-radius:8px; padding:10px 24px; color:#fff; font-size:0.9rem; font-weight:700; cursor:pointer; transition:.2s; }
+.btn-add:hover { background:#8b85ff; }
+.error { background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.2); color:#f87171; border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:0.85rem; }
+.success { background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.2); color:#22c55e; border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:0.85rem; }
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="/admin/">← לוח בקרה</a>
+  <div class="logo">🤖 ניהול אדמינים</div>
+</header>
+<main>
+  <div class="page-title">אדמינים ({{ admins|length }})</div>
+
+  {% if request.query_params.get('added') %}<div class="success">✅ אדמין נוסף בהצלחה</div>{% endif %}
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+  {% for a in admins %}
+  <div class="admin-row">
+    <span class="admin-name">👤 {{ a.username }}</span>
+    {% if a.is_super %}
+    <span class="admin-role role-super">אדמין ראשי</span>
+    {% else %}
+    <span class="admin-role role-admin">אדמין</span>
+    {% endif %}
+    <span style="font-size:0.75rem;color:var(--sub)">{{ a.created_at[:10] }}</span>
+    {% if not a.is_super or admins|length > 1 %}
+    <form method="post" action="/admin/admins/remove/{{ a.id }}" onsubmit="return confirm('להסיר אדמין זה?')">
+      <button type="submit" class="btn-remove">הסר</button>
+    </form>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  <div class="add-form">
+    <h3>➕ הוספת אדמין חדש</h3>
+    <form method="post" action="/admin/admins/add">
+      <div class="form-row">
+        <input type="text" name="username" placeholder="שם משתמש" required>
+        <input type="password" name="password" placeholder="סיסמה" required>
+      </div>
+      <div class="toggle-group">
+        <label class="toggle">
+          <input type="checkbox" name="is_super" value="1">
+          <span class="slider"></span>
+        </label>
+        <span style="font-size:0.85rem">אדמין ראשי (יכול לנהל אדמינים)</span>
+      </div>
+      <button type="submit" class="btn-add">הוסף אדמין</button>
+    </form>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מדריך חדש</title>
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+:root { --bg:#0d0d0d; --card:#1a1a1a; --card2:#222; --border:#2a2a2a; --accent:#6c63ff; --text:#f0f0f0; --sub:#888; }
+body { background:var(--bg); color:var(--text); font-family:'Segoe UI',Arial,sans-serif; min-height:100vh; }
+header { background:linear-gradient(135deg,#111,#1a1030); border-bottom:2px solid var(--accent); padding:16px 32px; display:flex; align-items:center; gap:20px; }
+.back { color:var(--sub); text-decoration:none; font-size:0.9rem; }
+.back:hover { color:var(--accent); }
+.logo { font-size:1.2rem; font-weight:800; color:var(--accent); }
+main { max-width:860px; margin:0 auto; padding:40px 20px; }
+.page-title { font-size:1.5rem; font-weight:800; margin-bottom:32px; }
+.form-group { margin-bottom:24px; }
+label { display:block; font-size:0.85rem; color:var(--sub); margin-bottom:8px; font-weight:600; }
+input[type=text], textarea {
+  width:100%; background:#111; border:1px solid var(--border); border-radius:10px;
+  padding:12px 16px; color:var(--text); font-size:0.95rem; outline:none; transition:.2s;
+  font-family:inherit;
+}
+input[type=text]:focus, textarea:focus { border-color:var(--accent); }
+textarea { min-height:300px; resize:vertical; line-height:1.6; }
+.rich-hint { font-size:0.75rem; color:var(--sub); margin-top:6px; }
+.file-drop {
+  border:2px dashed var(--border); border-radius:12px; padding:32px; text-align:center;
+  cursor:pointer; transition:.2s; background:var(--card);
+}
+.file-drop:hover, .file-drop.dragover { border-color:var(--accent); background:#1a1a2a; }
+.file-drop-icon { font-size:2rem; margin-bottom:8px; }
+.file-drop p { color:var(--sub); font-size:0.9rem; }
+.file-drop input[type=file] { display:none; }
+.selected-files { margin-top:12px; display:flex; flex-direction:column; gap:8px; }
+.selected-file { background:var(--card2); border:1px solid var(--border); border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; font-size:0.85rem; }
+.toggle-group { display:flex; align-items:center; gap:12px; }
+.toggle { position:relative; width:48px; height:26px; }
+.toggle input { opacity:0; width:0; height:0; }
+.slider { position:absolute; inset:0; background:#333; border-radius:13px; cursor:pointer; transition:.2s; }
+.slider:before { content:''; position:absolute; width:20px; height:20px; bottom:3px; right:3px; background:#fff; border-radius:50%; transition:.2s; }
+.toggle input:checked + .slider { background:var(--accent); }
+.toggle input:checked + .slider:before { transform:translateX(-22px); }
+.toggle-label { font-size:0.9rem; }
+.btn-submit { background:var(--accent); border:none; border-radius:10px; padding:14px 32px; color:#fff; font-size:1rem; font-weight:700; cursor:pointer; transition:.2s; }
+.btn-submit:hover { background:#8b85ff; }
+.cover-preview { margin-top:12px; max-width:300px; border-radius:8px; display:none; }
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="/admin/">← חזרה</a>
+  <div class="logo">🤖 מדריך חדש</div>
+</header>
+<main>
+  <div class="page-title">יצירת מדריך חדש</div>
+  <form method="post" enctype="multipart/form-data">
+    <div class="form-group">
+      <label>כותרת המדריך *</label>
+      <input type="text" name="title" placeholder="לדוגמה: איך משתמשים ב-ChatGPT" required>
+    </div>
+
+    <div class="form-group">
+      <label>תוכן המדריך (HTML מותר)</label>
+      <textarea name="description" placeholder="כתוב את תוכן המדריך כאן...&#10;&#10;אפשר להשתמש בתגיות HTML:&#10;&lt;h2&gt;כותרת&lt;/h2&gt;&#10;&lt;p&gt;פסקה&lt;/p&gt;&#10;&lt;strong&gt;מודגש&lt;/strong&gt;&#10;&lt;img src=&quot;...&quot;&gt;"></textarea>
+      <div class="rich-hint">💡 ניתן להשתמש ב-HTML: &lt;h2&gt; &lt;p&gt; &lt;strong&gt; &lt;img&gt; &lt;a&gt; &lt;ul&gt; &lt;pre&gt; &lt;code&gt;</div>
+    </div>
+
+    <div class="form-group">
+      <label>תמונת שער</label>
+      <div class="file-drop" onclick="document.getElementById('coverInput').click()">
+        <div class="file-drop-icon">🖼</div>
+        <p>לחץ לבחירת תמונה (JPG, PNG, WEBP)</p>
+        <input id="coverInput" type="file" name="cover" accept="image/*" onchange="previewCover(this)">
+      </div>
+      <img id="coverPreview" class="cover-preview" alt="תצוגה מקדימה">
+    </div>
+
+    <div class="form-group">
+      <label>קבצים להורדה (כל סוג קובץ)</label>
+      <div class="file-drop" id="fileDrop" onclick="document.getElementById('filesInput').click()">
+        <div class="file-drop-icon">📎</div>
+        <p>לחץ לבחירת קבצים — כל סוג מותר</p>
+        <input id="filesInput" type="file" name="files" multiple onchange="showFiles(this)">
+      </div>
+      <div class="selected-files" id="selectedFiles"></div>
+    </div>
+
+    <div class="form-group">
+      <div class="toggle-group">
+        <label class="toggle">
+          <input type="checkbox" name="is_published" value="1" checked>
+          <span class="slider"></span>
+        </label>
+        <span class="toggle-label">פרסם מיד</span>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit">✅ צור מדריך</button>
+  </form>
+</main>
+<script>
+function previewCover(input) {
+  const img = document.getElementById('coverPreview');
+  if (input.files[0]) {
+    img.src = URL.createObjectURL(input.files[0]);
+    img.style.display = 'block';
+  }
+}
+function showFiles(input) {
+  const container = document.getElementById('selectedFiles');
+  container.innerHTML = '';
+  [...input.files].forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'selected-file';
+    div.innerHTML = `<span>📄 ${f.name}</span><span style="color:#888">${(f.size/1024/1024).toFixed(1)} MB</span>`;
+    container.appendChild(div);
+  });
+}
+const drop = document.getElementById('fileDrop');
+drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('dragover'); });
+drop.addEventListener('dragleave', () => drop.classList.remove('dragover'));
+drop.addEventListener('drop', e => {
+  e.preventDefault(); drop.classList.remove('dragover');
+  document.getElementById('filesInput').files = e.dataTransfer.files;
+  showFiles(document.getElementById('filesInput'));
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>לוח בקרה — מדריכי AI</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --bg:#0d0d0d; --card:#1a1a1a; --card2:#222; --border:#2a2a2a; --accent:#6c63ff; --text:#f0f0f0; --sub:#888; }
+body { background:var(--bg); color:var(--text); font-family:'Segoe UI',Arial,sans-serif; min-height:100vh; }
+header { background:linear-gradient(135deg,#111,#1a1030); border-bottom:2px solid var(--accent); padding:16px 32px; display:flex; align-items:center; justify-content:space-between; }
+.logo { font-size:1.2rem; font-weight:800; color:var(--accent); }
+.header-actions { display:flex; gap:12px; align-items:center; }
+.btn { padding:8px 18px; border-radius:8px; border:none; cursor:pointer; font-size:0.85rem; font-weight:600; transition:.2s; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+.btn-primary { background:var(--accent); color:#fff; }
+.btn-primary:hover { background:#8b85ff; }
+.btn-ghost { background:none; border:1px solid var(--border); color:var(--sub); }
+.btn-ghost:hover { border-color:var(--accent); color:var(--text); }
+.btn-danger { background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.3); color:#f87171; }
+.btn-danger:hover { background:rgba(239,68,68,.2); }
+main { max-width:1100px; margin:0 auto; padding:40px 20px; }
+.page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; }
+.page-title { font-size:1.5rem; font-weight:800; }
+table { width:100%; border-collapse:collapse; }
+th { text-align:right; padding:12px 16px; font-size:0.8rem; color:var(--sub); text-transform:uppercase; border-bottom:1px solid var(--border); }
+td { padding:14px 16px; border-bottom:1px solid var(--border); font-size:0.9rem; vertical-align:middle; }
+tr:hover td { background:var(--card); }
+.badge { display:inline-block; padding:3px 10px; border-radius:10px; font-size:0.75rem; font-weight:700; }
+.badge-green { background:rgba(34,197,94,.1); color:#22c55e; border:1px solid rgba(34,197,94,.2); }
+.badge-gray { background:var(--card2); color:var(--sub); border:1px solid var(--border); }
+.actions { display:flex; gap:8px; }
+.admin-info { color:var(--sub); font-size:0.85rem; }
+.admin-info strong { color:var(--text); }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🤖 מדריכי AI — ניהול</div>
+  <div class="header-actions">
+    <span class="admin-info">שלום, <strong>{{ admin.username }}</strong></span>
+    {% if admin.is_super %}<a href="/admin/admins" class="btn btn-ghost">👥 אדמינים</a>{% endif %}
+    <a href="/admin/logout" class="btn btn-ghost">יציאה</a>
+  </div>
+</header>
+
+<main>
+  <div class="page-header">
+    <div class="page-title">מדריכים ({{ guides|length }})</div>
+    <a href="/admin/new" class="btn btn-primary">+ מדריך חדש</a>
+  </div>
+
+  {% if guides %}
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>כותרת</th>
+        <th>סטטוס</th>
+        <th>קבצים</th>
+        <th>נוצר</th>
+        <th>פעולות</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for g in guides %}
+      <tr>
+        <td style="color:var(--sub)">{{ g.id }}</td>
+        <td><strong>{{ g.title }}</strong></td>
+        <td>
+          {% if g.is_published %}
+          <span class="badge badge-green">פורסם</span>
+          {% else %}
+          <span class="badge badge-gray">טיוטה</span>
+          {% endif %}
+        </td>
+        <td style="color:var(--sub)">{{ g.file_count }}</td>
+        <td style="color:var(--sub)">{{ g.created_at[:10] }}</td>
+        <td>
+          <div class="actions">
+            <a href="/guide/{{ g.id }}" target="_blank" class="btn btn-ghost">👁 צפייה</a>
+            <a href="/admin/edit/{{ g.id }}" class="btn btn-primary">✏️ עריכה</a>
+            <form method="post" action="/admin/delete/{{ g.id }}" onsubmit="return confirm('למחוק את המדריך?')">
+              <button type="submit" class="btn btn-danger">🗑</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div style="text-align:center;padding:60px;color:var(--sub)">
+    <div style="font-size:3rem;margin-bottom:16px">📝</div>
+    <p>אין מדריכים עדיין — <a href="/admin/new" style="color:var(--accent)">צור את הראשון</a></p>
+  </div>
+  {% endif %}
+</main>
+</body>
+</html>
