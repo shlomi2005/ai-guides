@@ -15,10 +15,25 @@ from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse, JSON
 from fastapi.templating import Jinja2Templates
 from jose import jwt, JWTError
 
-DATA_DIR = os.environ.get("DATA_DIR", ".")
+DATA_DIR = os.environ.get("DATA_DIR", "/data")
 DB_PATH = os.path.join(DATA_DIR, "guides.db")
 FILES_DIR = os.path.join(DATA_DIR, "files")
-SECRET_KEY = os.environ.get("SECRET_KEY", "change-me-in-production-please")
+_secret_file = os.path.join(DATA_DIR, ".secret_key")
+
+def _load_secret_key() -> str:
+    env_key = os.environ.get("SECRET_KEY", "")
+    if env_key:
+        return env_key
+    os.makedirs(DATA_DIR, exist_ok=True)
+    if os.path.exists(_secret_file):
+        return open(_secret_file).read().strip()
+    import secrets
+    key = secrets.token_hex(32)
+    with open(_secret_file, "w") as f:
+        f.write(key)
+    return key
+
+SECRET_KEY = _load_secret_key()
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 7
 MAX_FILE_MB = 500
