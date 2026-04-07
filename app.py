@@ -490,23 +490,41 @@ async def react(guide_id: int, request: Request):
         guide = conn.execute("SELECT id FROM guides WHERE id=? AND is_published=1", (guide_id,)).fetchone()
         if not guide:
             raise HTTPException(status_code=404)
-        try:
+        # Find existing reaction by this user on this guide (any emoji)
+        existing = conn.execute(
+            "SELECT emoji FROM reactions WHERE guide_id=? AND ip_hash=?",
+            (guide_id, rkey)
+        ).fetchone()
+        old_emoji = existing["emoji"] if existing else None
+        removed_emoji = None
+        removed_count = 0
+        if old_emoji == emoji:
+            # Toggle off — same emoji clicked again
+            conn.execute("DELETE FROM reactions WHERE guide_id=? AND ip_hash=?", (guide_id, rkey))
+            action = "removed"
+        else:
+            # Remove previous reaction if any
+            if old_emoji:
+                conn.execute("DELETE FROM reactions WHERE guide_id=? AND ip_hash=?", (guide_id, rkey))
+                removed_count = conn.execute(
+                    "SELECT COUNT(*) as cnt FROM reactions WHERE guide_id=? AND emoji=?",
+                    (guide_id, old_emoji)
+                ).fetchone()["cnt"]
+                removed_emoji = old_emoji
             conn.execute(
-                "INSERT INTO reactions (guide_id, emoji, ip_hash) VALUES (?,?,?)",
+                "INSERT OR IGNORE INTO reactions (guide_id, emoji, ip_hash) VALUES (?,?,?)",
                 (guide_id, emoji, rkey)
             )
             action = "added"
-        except sqlite3.IntegrityError:
-            conn.execute(
-                "DELETE FROM reactions WHERE guide_id=? AND emoji=? AND ip_hash=?",
-                (guide_id, emoji, rkey)
-            )
-            action = "removed"
         count = conn.execute(
             "SELECT COUNT(*) as cnt FROM reactions WHERE guide_id=? AND emoji=?",
             (guide_id, emoji)
         ).fetchone()["cnt"]
-    return JSONResponse({"action": action, "count": count, "emoji": emoji})
+    result = {"action": action, "count": count, "emoji": emoji}
+    if removed_emoji is not None:
+        result["removed_emoji"] = removed_emoji
+        result["removed_count"] = removed_count
+    return JSONResponse(result)
 
 
 @app.get("/files/{filename}")

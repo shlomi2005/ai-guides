@@ -313,7 +313,7 @@ body { background: var(--bg); color: var(--t1); font-family: 'Inter', system-ui,
     {% for emoji in allowed_emojis %}
     <button class="r-btn" data-emoji="{{ emoji }}" onclick="react('{{ emoji }}')">
       <span>{{ emoji }}</span>
-      <span class="r-cnt" id="rc-{{ loop.index0 }}">{{ reactions.get(emoji, 0) if reactions.get(emoji, 0) > 0 else '' }}</span>
+      <span class="r-cnt" id="rc-{{ loop.index0 }}">{{ reactions.get(emoji, 0) }}</span>
     </button>
     {% endfor %}
   </div>
@@ -325,11 +325,11 @@ body { background: var(--bg); color: var(--t1); font-family: 'Inter', system-ui,
 const guideId = {{ guide.id }};
 const guideUrl = window.location.href;
 const EMOJIS = {{ allowed_emojis | tojson }};
-const myR = new Set(JSON.parse(localStorage.getItem('r_' + guideId) || '[]'));
+let myReaction = localStorage.getItem('r_' + guideId) || null;
 
-// Init reactions
+// Init reactions — highlight saved selection
 document.querySelectorAll('.r-btn').forEach(btn => {
-  if (myR.has(btn.dataset.emoji)) btn.classList.add('active');
+  if (btn.dataset.emoji === myReaction) btn.classList.add('active');
 });
 
 async function react(emoji) {
@@ -338,12 +338,27 @@ async function react(emoji) {
     body: JSON.stringify({emoji})
   });
   const d = await res.json();
+  const btns = document.querySelectorAll('.r-btn');
+  // Update clicked emoji button + count
   const i = EMOJIS.indexOf(emoji);
-  const btn = document.querySelectorAll('.r-btn')[i];
-  document.getElementById('rc-' + i).textContent = d.count > 0 ? d.count : '';
-  if (d.action === 'added') { btn.classList.add('active'); myR.add(emoji); toast(emoji + ' תודה!'); }
-  else { btn.classList.remove('active'); myR.delete(emoji); }
-  localStorage.setItem('r_' + guideId, JSON.stringify([...myR]));
+  document.getElementById('rc-' + i).textContent = d.count;
+  if (d.action === 'added') {
+    // Deactivate all, then activate chosen
+    btns.forEach(b => b.classList.remove('active'));
+    btns[i].classList.add('active');
+    myReaction = emoji;
+    toast(emoji + ' תודה!');
+  } else {
+    btns[i].classList.remove('active');
+    myReaction = null;
+  }
+  // Update previously-removed emoji's count if server returned one
+  if (d.removed_emoji) {
+    const j = EMOJIS.indexOf(d.removed_emoji);
+    if (j >= 0) document.getElementById('rc-' + j).textContent = d.removed_count;
+  }
+  if (myReaction) localStorage.setItem('r_' + guideId, myReaction);
+  else localStorage.removeItem('r_' + guideId);
 }
 
 // Progress bar
