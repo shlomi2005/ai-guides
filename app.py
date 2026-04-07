@@ -263,10 +263,16 @@ async def serve_file(filename: str, request: Request):
         raise HTTPException(status_code=404)
     with get_db() as conn:
         f = conn.execute("SELECT original_name, mime_type FROM guide_files WHERE stored_name=?", (filename,)).fetchone()
-    if not f:
+        is_cover = conn.execute("SELECT id FROM guides WHERE cover_image=?", (filename,)).fetchone()
+    if not f and not is_cover:
         raise HTTPException(status_code=404)
-    return FileResponse(path, media_type=f["mime_type"] or "application/octet-stream",
-                        headers={"Content-Disposition": f'attachment; filename="{f["original_name"]}"'})
+    if f:
+        return FileResponse(path, media_type=f["mime_type"] or "application/octet-stream",
+                            headers={"Content-Disposition": f'attachment; filename="{f["original_name"]}"'})
+    # cover image — serve inline
+    import mimetypes
+    mime = mimetypes.guess_type(filename)[0] or "image/jpeg"
+    return FileResponse(path, media_type=mime)
 
 
 # ─── Admin Routes ─────────────────────────────────────────────────────────────
