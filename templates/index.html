@@ -180,21 +180,36 @@ html, body {
   </div>
   {% endif %}
   {% if current_user %}
-  <a href="/auth/logout" style="font-size:0.75rem;color:var(--t3);text-decoration:none;flex-shrink:0;padding:5px 8px;border-radius:6px;transition:background 120ms" onmouseover="this.style.background='rgba(124,92,46,0.1)'" onmouseout="this.style.background='transparent'">יציאה</a>
+  <span style="font-size:0.75rem;color:var(--t3);white-space:nowrap;flex-shrink:0">שלום, <strong style="color:var(--t2)">{{ current_user.name }}</strong></span>
   {% endif %}
 </div>
 
 <div class="shell">
   <aside class="sidebar">
-    <div class="sb-label">ראשי</div>
-    <a class="sb-item active" href="/">
+    <div class="sb-label">קטגוריות</div>
+    <a class="sb-item {{ 'active' if not active_cat else '' }}" href="/">
       <span class="sb-ic">📚</span> כל המדריכים
-      {% if guides %}<span class="sb-badge">{{ guides|length }}</span>{% endif %}
+      {% set total = cat_counts.values()|sum %}
+      {% if total %}<span class="sb-badge">{{ total }}</span>{% endif %}
     </a>
+    {% for key, label in CATEGORIES %}
+    {% set cnt = cat_counts.get(key, 0) %}
+    {% if cnt > 0 %}
+    <a class="sb-item {{ 'active' if active_cat == key else '' }}" href="/?cat={{ key }}">
+      <span class="sb-ic">{{ label.split(' ')[0] }}</span> {{ label.split(' ', 1)[1] }}
+      <span class="sb-badge" style="background:rgba(124,92,46,0.15);color:var(--acc)">{{ cnt }}</span>
+    </a>
+    {% endif %}
+    {% endfor %}
     <div class="sb-sep"></div>
     <div class="sb-label">ניהול</div>
+    {% if current_user and (current_user.is_admin or current_user.is_editor) %}
     <a class="sb-item" href="/admin/">
       <span class="sb-ic">⚙️</span> לוח בקרה
+    </a>
+    {% endif %}
+    <a class="sb-item" href="/auth/logout">
+      <span class="sb-ic">🚪</span> יציאה
     </a>
   </aside>
 

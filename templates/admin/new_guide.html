@@ -9,20 +9,13 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #e8dccb; --bg2: #dfd3be; --card: #f5efe4; --card2: #ede5d6;
+  --bg: #e8dccb; --card: #f5efe4; --card2: #ede5d6;
   --border: rgba(120,90,50,0.13); --border2: rgba(120,90,50,0.25);
   --acc: #7c5c2e; --acc-h: #9a7340;
   --t1: #1c140a; --t2: #6b5740; --t3: #a09078;
 }
-html, body { background: var(--bg); color: var(--t1);
-  font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
-
-.topbar {
-  position: sticky; top: 0; z-index: 100; height: 54px;
-  background: rgba(232,220,203,0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; padding: 0 24px; gap: 12px;
-}
+html, body { background: var(--bg); color: var(--t1); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.topbar { position: sticky; top: 0; z-index: 100; height: 54px; background: rgba(232,220,203,0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 12px; }
 .t-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; flex-shrink: 0; }
 .t-logo-mark { width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, var(--acc), var(--acc-h)); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
 .t-logo-text { font-size: 0.875rem; font-weight: 700; color: var(--t1); }
@@ -30,53 +23,51 @@ html, body { background: var(--bg); color: var(--t1);
 .t-back { display: flex; align-items: center; gap: 6px; color: var(--t2); text-decoration: none; font-size: 0.8125rem; font-weight: 500; padding: 5px 10px; border-radius: 7px; transition: background 120ms, color 120ms; }
 .t-back:hover { background: rgba(124,92,46,0.1); color: var(--t1); }
 .t-crumb { font-size: 0.8125rem; color: var(--t3); }
-
-.main { max-width: 780px; margin: 0 auto; padding: 40px 24px 80px; }
-.page-h { font-size: 1rem; font-weight: 700; color: var(--t1); margin-bottom: 28px; letter-spacing: -0.01em; }
-
-.form-group { margin-bottom: 24px; }
+.layout { display: grid; grid-template-columns: 1fr 300px; gap: 20px; max-width: 1080px; margin: 0 auto; padding: 28px 20px 80px; }
+@media (max-width: 820px) { .layout { grid-template-columns: 1fr; } .sidebar-col { order: -1; } }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px; box-shadow: 0 1px 3px rgba(80,50,20,0.08); margin-bottom: 16px; }
+.card-title { font-size: 0.6875rem; font-weight: 700; color: var(--t3); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 16px; }
 label { display: block; font-size: 0.6875rem; font-weight: 700; color: var(--t3); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
-input[type=text], textarea {
-  width: 100%; background: rgba(255,255,255,0.65); border: 1px solid var(--border);
-  border-radius: 9px; padding: 11px 14px; color: var(--t1);
-  font-size: 0.875rem; font-family: inherit; outline: none;
-  transition: border-color 150ms, box-shadow 150ms;
-}
-input[type=text]:focus, textarea:focus { border-color: var(--border2); box-shadow: 0 0 0 3px rgba(124,92,46,0.1); background: #fff; }
-input::placeholder, textarea::placeholder { color: var(--t3); }
-textarea { min-height: 320px; resize: vertical; line-height: 1.65; font-family: 'JetBrains Mono','Courier New',monospace; font-size: 0.8125rem; }
+input[type=text], select { width: 100%; background: rgba(255,255,255,0.65); border: 1px solid var(--border); border-radius: 9px; padding: 11px 14px; color: var(--t1); font-size: 0.875rem; font-family: inherit; outline: none; transition: border-color 150ms, box-shadow 150ms; }
+input[type=text]:focus, select:focus { border-color: var(--border2); box-shadow: 0 0 0 3px rgba(124,92,46,0.1); background: #fff; }
+input::placeholder { color: var(--t3); }
+select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6' fill='none' stroke='%23a09078' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 14px center; padding-left: 36px; }
+.form-group { margin-bottom: 18px; }
+.editor-wrap { border: 1px solid var(--border); border-radius: 9px; overflow: hidden; transition: border-color 150ms, box-shadow 150ms; }
+.editor-wrap:focus-within { border-color: var(--border2); box-shadow: 0 0 0 3px rgba(124,92,46,0.1); }
+.toolbar { display: flex; gap: 2px; padding: 7px 8px; background: var(--card2); border-bottom: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
+.tb-btn { background: none; border: none; border-radius: 5px; min-width: 28px; height: 26px; padding: 0 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.8125rem; color: var(--t2); transition: background 100ms; font-family: inherit; flex-shrink: 0; }
+.tb-btn:hover { background: rgba(124,92,46,0.12); color: var(--t1); }
+.tb-sep { width: 1px; height: 18px; background: var(--border2); margin: 0 3px; flex-shrink: 0; }
+textarea { width: 100%; background: rgba(255,255,255,0.7); border: none; outline: none; padding: 14px; color: var(--t1); font-size: 0.875rem; font-family: 'JetBrains Mono','Courier New',monospace; line-height: 1.7; resize: vertical; min-height: 380px; }
 .hint { font-size: 0.75rem; color: var(--t3); margin-top: 7px; }
-
-.file-drop {
-  border: 1px dashed var(--border2); border-radius: 10px; padding: 28px 20px;
-  text-align: center; cursor: pointer;
-  transition: border-color 150ms, background 150ms; background: rgba(255,255,255,0.4);
-}
-.file-drop:hover, .file-drop.dragover { border-color: var(--acc); background: rgba(255,255,255,0.7); }
-.file-drop-icon { font-size: 1.5rem; margin-bottom: 7px; opacity: 0.5; }
-.file-drop p { font-size: 0.8125rem; color: var(--t3); }
+.file-drop { border: 2px dashed var(--border2); border-radius: 10px; padding: 24px 16px; text-align: center; cursor: pointer; transition: border-color 150ms, background 150ms; background: rgba(255,255,255,0.35); }
+.file-drop:hover, .file-drop.dragover { border-color: var(--acc); background: rgba(255,255,255,0.65); }
+.file-drop-icon { font-size: 1.6rem; margin-bottom: 7px; opacity: 0.4; }
+.file-drop p { font-size: 0.8125rem; color: var(--t3); margin-bottom: 3px; }
+.file-drop small { font-size: 0.75rem; color: var(--t3); opacity: 0.7; }
 .file-drop input[type=file] { display: none; }
-.selected-files { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
-.selected-file { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 9px 13px; display: flex; justify-content: space-between; font-size: 0.8125rem; color: var(--t2); }
-.cover-preview { margin-top: 12px; max-width: 280px; border-radius: 8px; border: 1px solid var(--border); display: none; }
-
-.toggle-group { display: flex; align-items: center; gap: 12px; }
-.toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+.selected-files { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; }
+.selected-file { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; gap: 9px; font-size: 0.8125rem; color: var(--t2); }
+.sf-icon { flex-shrink: 0; }
+.sf-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sf-size { color: var(--t3); font-size: 0.75rem; white-space: nowrap; }
+.cover-preview-wrap { display: none; margin-top: 10px; position: relative; }
+.cover-preview-wrap img { width: 100%; border-radius: 8px; border: 1px solid var(--border); max-height: 140px; object-fit: cover; }
+.cover-remove { position: absolute; top: 6px; left: 6px; background: rgba(0,0,0,0.55); border: none; color: #fff; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; }
+.toggle-group { display: flex; align-items: flex-start; gap: 12px; }
+.toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; margin-top: 1px; }
 .toggle input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; inset: 0; background: var(--card2); border: 1px solid var(--border2); border-radius: 12px; cursor: pointer; transition: background 150ms; }
 .slider:before { content: ''; position: absolute; width: 18px; height: 18px; bottom: 2px; right: 2px; background: var(--t3); border-radius: 50%; transition: transform 150ms, background 150ms; }
 .toggle input:checked + .slider { background: rgba(124,92,46,0.2); border-color: rgba(124,92,46,0.5); }
 .toggle input:checked + .slider:before { transform: translateX(-20px); background: var(--acc); }
-.toggle-label { font-size: 0.875rem; color: var(--t2); }
-
-.btn-submit { background: var(--acc); border: none; border-radius: 9px; padding: 11px 30px; color: #f5efe4; font-size: 0.9rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 150ms, transform 150ms; }
+.toggle-label { font-size: 0.875rem; color: var(--t1); font-weight: 500; display: block; }
+.toggle-desc { font-size: 0.75rem; color: var(--t3); display: block; margin-top: 2px; }
+.btn-submit { width: 100%; background: var(--acc); border: none; border-radius: 10px; padding: 13px; color: #f5efe4; font-size: 0.9375rem; font-weight: 700; font-family: inherit; cursor: pointer; transition: background 150ms, transform 150ms; margin-top: 14px; }
 .btn-submit:hover { background: var(--acc-h); }
 .btn-submit:active { transform: scale(0.98); }
-
-.hr { height: 1px; background: var(--border); margin: 28px 0; }
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar { width: 5px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 </style>
 </head>
 <body>
@@ -88,76 +79,102 @@ textarea { min-height: 320px; resize: vertical; line-height: 1.65; font-family: 
   <span class="t-crumb">מדריך חדש</span>
 </div>
 
-<div class="main">
-  <div class="page-h">יצירת מדריך חדש</div>
-  <form method="post" enctype="multipart/form-data">
-
-    <div class="form-group">
-      <label>כותרת המדריך</label>
-      <input type="text" name="title" placeholder="לדוגמה: איך משתמשים ב-ChatGPT" required>
-    </div>
-
-    <div class="form-group">
-      <label>תוכן המדריך</label>
-      <textarea name="description" placeholder="כתוב את תוכן המדריך כאן...&#10;&#10;ניתן להשתמש ב-HTML:&#10;&lt;h2&gt;כותרת&lt;/h2&gt; &lt;p&gt;פסקה&lt;/p&gt;"></textarea>
-      <div class="hint">HTML מותר: &lt;h2&gt; &lt;h3&gt; &lt;p&gt; &lt;strong&gt; &lt;em&gt; &lt;a&gt; &lt;img&gt; &lt;ul&gt; &lt;ol&gt; &lt;pre&gt; &lt;code&gt; &lt;blockquote&gt;</div>
-    </div>
-
-    <div class="hr"></div>
-
-    <div class="form-group">
-      <label>תמונת שער</label>
-      <div class="file-drop" onclick="document.getElementById('coverInput').click()">
-        <div class="file-drop-icon">🖼</div>
-        <p>לחץ לבחירת תמונה (JPG, PNG, WEBP)</p>
-        <input id="coverInput" type="file" name="cover" accept="image/*" onchange="previewCover(this)">
+<form method="post" enctype="multipart/form-data">
+<div class="layout">
+  <div class="main-col">
+    <div class="card">
+      <div class="card-title">תוכן המדריך</div>
+      <div class="form-group">
+        <label>כותרת</label>
+        <input type="text" name="title" placeholder="לדוגמה: איך משתמשים ב-ChatGPT בצורה נכונה" required autofocus>
       </div>
-      <img id="coverPreview" class="cover-preview" alt="">
+      <div class="form-group">
+        <label>תוכן</label>
+        <div class="editor-wrap">
+          <div class="toolbar">
+            <button type="button" class="tb-btn" onclick="wrap('<h2>','</h2>')"><b style="font-size:0.7rem">H2</b></button>
+            <button type="button" class="tb-btn" onclick="wrap('<h3>','</h3>')"><b style="font-size:0.7rem">H3</b></button>
+            <div class="tb-sep"></div>
+            <button type="button" class="tb-btn" onclick="wrap('<strong>','</strong>')"><b>B</b></button>
+            <button type="button" class="tb-btn" onclick="wrap('<em>','</em>')"><i>I</i></button>
+            <div class="tb-sep"></div>
+            <button type="button" class="tb-btn" onclick="insertList()">☰</button>
+            <button type="button" class="tb-btn" onclick="wrap('<blockquote>','</blockquote>')">❝</button>
+            <button type="button" class="tb-btn" onclick="wrap('<code>','</code>')" style="font-family:monospace">&lt;/&gt;</button>
+            <div class="tb-sep"></div>
+            <button type="button" class="tb-btn" onclick="insertLink()">🔗</button>
+            <button type="button" class="tb-btn" onclick="insertImage()">🖼</button>
+          </div>
+          <textarea id="contentArea" name="description" placeholder="כתוב את תוכן המדריך כאן..."></textarea>
+        </div>
+        <div class="hint">HTML מותר: h2 h3 p strong em a img ul ol li pre code blockquote</div>
+      </div>
     </div>
-
-    <div class="form-group">
-      <label>קבצים להורדה</label>
+    <div class="card">
+      <div class="card-title">קבצים להורדה</div>
       <div class="file-drop" id="fileDrop" onclick="document.getElementById('filesInput').click()">
         <div class="file-drop-icon">📎</div>
-        <p>לחץ לבחירת קבצים — כל סוג מותר</p>
+        <p>גרור קבצים לכאן או לחץ לבחירה</p>
+        <small>כל סוג קובץ — PDF, Word, Excel, תמונות, וידאו ועוד</small>
         <input id="filesInput" type="file" name="files" multiple onchange="showFiles(this)">
       </div>
       <div class="selected-files" id="selectedFiles"></div>
     </div>
+  </div>
 
-    <div class="hr"></div>
-
-    <div class="form-group">
+  <div class="sidebar-col">
+    <div class="card">
+      <div class="card-title">פרסום</div>
       <div class="toggle-group">
         <label class="toggle"><input type="checkbox" name="is_published" value="1" checked><span class="slider"></span></label>
-        <span class="toggle-label">פרסם מיד</span>
+        <div>
+          <span class="toggle-label">פרסם מיד</span>
+          <span class="toggle-desc">יופיע לכל הגולשים</span>
+        </div>
+      </div>
+      <button type="submit" class="btn-submit">✓ צור מדריך</button>
+    </div>
+    <div class="card">
+      <div class="card-title">קטגוריה</div>
+      <select name="category">
+        <option value="">— ללא קטגוריה —</option>
+        {% for key, label in CATEGORIES %}
+        <option value="{{ key }}">{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="card">
+      <div class="card-title">תמונת שער</div>
+      <div class="file-drop" style="padding:18px 14px" onclick="document.getElementById('coverInput').click()">
+        <div class="file-drop-icon">🖼</div>
+        <p>לחץ לבחירת תמונה</p>
+        <small>JPG, PNG, WEBP</small>
+        <input id="coverInput" type="file" name="cover" accept="image/*" onchange="previewCover(this)">
+      </div>
+      <div class="cover-preview-wrap" id="coverPreviewWrap">
+        <img id="coverPreview" alt="">
+        <button type="button" class="cover-remove" onclick="removeCover()">✕</button>
       </div>
     </div>
-
-    <button type="submit" class="btn-submit">צור מדריך</button>
-  </form>
+  </div>
 </div>
+</form>
+
 <script>
-function previewCover(input) {
-  const img = document.getElementById('coverPreview');
-  if (input.files[0]) { img.src = URL.createObjectURL(input.files[0]); img.style.display = 'block'; }
-}
-function showFiles(input) {
-  const c = document.getElementById('selectedFiles'); c.innerHTML = '';
-  [...input.files].forEach(f => {
-    const d = document.createElement('div'); d.className = 'selected-file';
-    d.innerHTML = `<span>${f.name}</span><span>${(f.size/1024/1024).toFixed(1)} MB</span>`;
-    c.appendChild(d);
-  });
-}
-const drop = document.getElementById('fileDrop');
-drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('dragover'); });
-drop.addEventListener('dragleave', () => drop.classList.remove('dragover'));
-drop.addEventListener('drop', e => {
-  e.preventDefault(); drop.classList.remove('dragover');
-  document.getElementById('filesInput').files = e.dataTransfer.files;
-  showFiles(document.getElementById('filesInput'));
-});
+function getTA(){return document.getElementById('contentArea');}
+function wrap(o,c){const ta=getTA(),s=ta.selectionStart,e=ta.selectionEnd;ta.setRangeText(o+(ta.value.substring(s,e)||'טקסט')+c,s,e,'end');ta.focus();}
+function insertList(){const ta=getTA();ta.setRangeText('<ul>\n  <li>פריט 1</li>\n  <li>פריט 2</li>\n</ul>',ta.selectionStart,ta.selectionEnd,'end');ta.focus();}
+function insertLink(){const u=prompt('כתובת הקישור:');if(!u)return;const ta=getTA(),s=ta.selectionStart,e=ta.selectionEnd;ta.setRangeText('<a href="'+u+'">'+(ta.value.substring(s,e)||'לחץ כאן')+'</a>',s,e,'end');ta.focus();}
+function insertImage(){const u=prompt('כתובת התמונה (URL):');if(!u)return;const ta=getTA();ta.setRangeText('<img src="'+u+'" alt="" style="max-width:100%">',ta.selectionStart,ta.selectionEnd,'end');ta.focus();}
+function fileIcon(n){const m={pdf:'📄',doc:'📝',docx:'📝',xls:'📊',xlsx:'📊',ppt:'📊',pptx:'📊',jpg:'🖼',jpeg:'🖼',png:'🖼',gif:'🖼',webp:'🖼',mp4:'🎬',mp3:'🎵',zip:'🗜',rar:'🗜'};return m[n.split('.').pop().toLowerCase()]||'📎';}
+function fmtSize(b){return b<1024?b+' B':b<1048576?(b/1024).toFixed(0)+' KB':(b/1048576).toFixed(1)+' MB';}
+function showFiles(input){const c=document.getElementById('selectedFiles');c.innerHTML='';[...input.files].forEach(f=>{const d=document.createElement('div');d.className='selected-file';d.innerHTML='<span class="sf-icon">'+fileIcon(f.name)+'</span><span class="sf-name">'+f.name+'</span><span class="sf-size">'+fmtSize(f.size)+'</span>';c.appendChild(d);});}
+const drop=document.getElementById('fileDrop');
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('dragover');});
+drop.addEventListener('dragleave',()=>drop.classList.remove('dragover'));
+drop.addEventListener('drop',e=>{e.preventDefault();drop.classList.remove('dragover');document.getElementById('filesInput').files=e.dataTransfer.files;showFiles(document.getElementById('filesInput'));});
+function previewCover(input){const w=document.getElementById('coverPreviewWrap'),img=document.getElementById('coverPreview');if(input.files[0]){img.src=URL.createObjectURL(input.files[0]);w.style.display='block';}}
+function removeCover(){document.getElementById('coverInput').value='';document.getElementById('coverPreviewWrap').style.display='none';}
 </script>
 </body>
 </html>

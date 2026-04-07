@@ -27,6 +27,16 @@ GOOGLE_CLIENT_ID     = os.environ.get("GOOGLE_CLIENT_ID", "")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
 BASE_URL             = os.environ.get("BASE_URL", "http://localhost:8000").rstrip("/")
 
+CATEGORIES = [
+    ("tools",    "🛠 כלים ותוכנות"),
+    ("guides",   "📚 מדריכים מעשיים"),
+    ("tips",     "💡 טיפים וטריקים"),
+    ("news",     "📰 חדשות ועדכונים"),
+    ("strategy", "🎯 אסטרטגיה"),
+    ("ethics",   "⚖️ אתיקה ובטיחות"),
+]
+CATEGORY_MAP = {k: v for k, v in CATEGORIES}
+
 def _load_secret_key() -> str:
     env_key = os.environ.get("SECRET_KEY", "")
     if env_key:
@@ -86,11 +96,18 @@ def init_db():
             picture TEXT DEFAULT '',
             created_at TEXT DEFAULT (datetime('now'))
         );
+        CREATE TABLE IF NOT EXISTS allowed_editors (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            label TEXT DEFAULT '',
+            added_at TEXT DEFAULT (datetime('now'))
+        );
         CREATE TABLE IF NOT EXISTS guides (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
             description TEXT DEFAULT '',
             cover_image TEXT DEFAULT '',
+            category TEXT DEFAULT '',
             created_by INTEGER,
             created_at TEXT DEFAULT (datetime('now')),
             updated_at TEXT DEFAULT (datetime('now')),
@@ -116,7 +133,6 @@ def init_db():
             UNIQUE(guide_id, emoji, ip_hash)
         );
         """)
-    # Safe migrations for existing DBs
     _migrate()
 
 
@@ -124,15 +140,22 @@ def _migrate():
     """Add new columns to existing tables if they don't exist."""
     conn = get_db()
     try:
-        for col, ddl in [
-            ("view_count", "ALTER TABLE guides ADD COLUMN view_count INTEGER DEFAULT 0"),
-            ("avatar",     "ALTER TABLE admins ADD COLUMN avatar TEXT DEFAULT ''"),
+        for ddl in [
+            "ALTER TABLE guides ADD COLUMN view_count INTEGER DEFAULT 0",
+            "ALTER TABLE admins ADD COLUMN avatar TEXT DEFAULT ''",
+            "ALTER TABLE guides ADD COLUMN category TEXT DEFAULT ''",
+            """CREATE TABLE IF NOT EXISTS allowed_editors (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT UNIQUE NOT NULL,
+                label TEXT DEFAULT '',
+                added_at TEXT DEFAULT (datetime('now'))
+            )""",
         ]:
             try:
                 conn.execute(ddl)
                 conn.commit()
             except Exception:
-                pass  # column already exists
+                pass
     finally:
         conn.close()
 
@@ -150,11 +173,11 @@ def create_admin_token(admin_id: int, username: str, is_super: bool) -> str:
         SECRET_KEY, algorithm=ALGORITHM
     )
 
-def create_user_token(user_id: int, name: str, email: str, picture: str) -> str:
+def create_user_token(user_id: int, name: str, email: str, picture: str, is_editor: bool = False) -> str:
     expire = datetime.utcnow() + timedelta(days=USER_TOKEN_DAYS)
     return jwt.encode(
         {"sub": str(user_id), "name": name, "email": email,
-         "picture": picture, "type": "user", "exp": expire},
+         "picture": picture, "is_editor": is_editor, "type": "user", "exp": expire},
         SECRET_KEY, algorithm=ALGORITHM
     )
 
@@ -178,21 +201,38 @@ def get_current_user(request: Request) -> Optional[dict]:
     admin = get_current_admin(request)
     if admin:
         return {"id": admin["sub"], "name": admin["username"],
-                "picture": "", "is_admin": True}
+                "picture": "", "is_admin": True, "is_editor": True}
     token = request.cookies.get("user_token")
     if not token:
         return None
     d = decode_token(token)
     if d and d.get("type") == "user":
         return {"id": d["sub"], "name": d["name"],
-                "picture": d.get("picture", ""), "is_admin": False}
+                "picture": d.get("picture", ""),
+                "is_admin": False, "is_editor": d.get("is_editor", False)}
     return None
 
 def require_admin(request: Request) -> dict:
+    """Requires username/password admin login."""
     admin = get_current_admin(request)
     if not admin:
         raise HTTPException(status_code=302, headers={"Location": "/admin/login"})
     return admin
+
+def require_editor(request: Request) -> dict:
+    """Allows both admins and permitted Google editors."""
+    admin = get_current_admin(request)
+    if admin:
+        return {"sub": admin["sub"], "username": admin["username"],
+                "is_super": admin.get("is_super", False), "is_editor": False, "is_admin": True}
+    token = request.cookies.get("user_token")
+    if token:
+        d = decode_token(token)
+        if d and d.get("type") == "user" and d.get("is_editor"):
+            return {"sub": d["sub"], "username": d["name"],
+                    "is_super": False, "is_editor": True, "is_admin": False,
+                    "picture": d.get("picture", "")}
+    raise HTTPException(status_code=302, headers={"Location": "/admin/login"})
 
 def google_configured() -> bool:
     return bool(GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET)
@@ -232,6 +272,8 @@ import json as _json
 templates.env.filters["fmt_size"]  = fmt_size
 templates.env.filters["tojson"]    = lambda v: _json.dumps(v, ensure_ascii=False)
 templates.env.globals["get_file_icon"] = get_file_icon
+templates.env.globals["CATEGORIES"] = CATEGORIES
+templates.env.globals["CATEGORY_MAP"] = CATEGORY_MAP
 
 
 # ─── Landing / Auth ───────────────────────────────────────────────────────────
@@ -309,7 +351,11 @@ async def google_callback(
     email     = guser.get("email", "")
     picture   = guser.get("picture", "")
 
+    # Check if this email is a permitted editor
     with get_db() as conn:
+        is_editor = bool(
+            conn.execute("SELECT id FROM allowed_editors WHERE lower(email)=lower(?)", (email,)).fetchone()
+        )
         existing = conn.execute("SELECT id FROM users WHERE google_id=?", (google_id,)).fetchone()
         if existing:
             user_id = existing["id"]
@@ -322,7 +368,7 @@ async def google_callback(
             )
             user_id = cur.lastrowid
 
-    token = create_user_token(user_id, name, email, picture)
+    token = create_user_token(user_id, name, email, picture, is_editor=is_editor)
     resp = RedirectResponse("/", status_code=302)
     resp.set_cookie("user_token", token, httponly=True,
                     max_age=USER_TOKEN_DAYS * 86400, samesite="lax")
@@ -343,16 +389,28 @@ async def index(request: Request):
     user = get_current_user(request)
     if not user and google_configured():
         return RedirectResponse("/landing")
+    cat = request.query_params.get("cat", "")
     with get_db() as conn:
-        guides = conn.execute("""
-            SELECT g.*,
-                (SELECT COUNT(*) FROM guide_files WHERE guide_id = g.id) as file_count,
-                a.username as author_name, a.avatar as author_avatar
-            FROM guides g
-            LEFT JOIN admins a ON g.created_by = a.id
-            WHERE g.is_published = 1
-            ORDER BY g.created_at DESC
-        """).fetchall()
+        if cat:
+            guides = conn.execute("""
+                SELECT g.*,
+                    (SELECT COUNT(*) FROM guide_files WHERE guide_id = g.id) as file_count,
+                    a.username as author_name, a.avatar as author_avatar
+                FROM guides g
+                LEFT JOIN admins a ON g.created_by = a.id
+                WHERE g.is_published = 1 AND g.category = ?
+                ORDER BY g.created_at DESC
+            """, (cat,)).fetchall()
+        else:
+            guides = conn.execute("""
+                SELECT g.*,
+                    (SELECT COUNT(*) FROM guide_files WHERE guide_id = g.id) as file_count,
+                    a.username as author_name, a.avatar as author_avatar
+                FROM guides g
+                LEFT JOIN admins a ON g.created_by = a.id
+                WHERE g.is_published = 1
+                ORDER BY g.created_at DESC
+            """).fetchall()
         all_reactions = {}
         for g in guides:
             rows = conn.execute(
@@ -361,6 +419,10 @@ async def index(request: Request):
             ).fetchall()
             all_reactions[g["id"]] = {r["emoji"]: r["cnt"] for r in rows}
         member_count = conn.execute("SELECT COUNT(*) as cnt FROM users").fetchone()["cnt"]
+        # Count per category for sidebar badges
+        cat_counts = {row["category"]: row["cnt"] for row in conn.execute(
+            "SELECT category, COUNT(*) as cnt FROM guides WHERE is_published=1 GROUP BY category"
+        ).fetchall()}
     return templates.TemplateResponse("index.html", {
         "request": request,
         "guides": guides,
@@ -368,6 +430,8 @@ async def index(request: Request):
         "allowed_emojis": ALLOWED_EMOJIS,
         "current_user": user,
         "member_count": member_count,
+        "active_cat": cat,
+        "cat_counts": cat_counts,
     })
 
 
@@ -401,12 +465,6 @@ async def view_guide(request: Request, guide_id: int):
             WHERE is_published=1 AND id != ?
             ORDER BY RANDOM() LIMIT 3
         """, (guide_id,)).fetchall()
-
-    rkey = reaction_key(request, user)
-    my_reactions_rows = conn.execute(
-        "SELECT emoji FROM reactions WHERE guide_id=? AND ip_hash=?",
-        (guide_id, rkey)
-    ).fetchall() if False else []  # handled client-side via localStorage
 
     return templates.TemplateResponse("guide.html", {
         "request": request,
@@ -503,7 +561,7 @@ async def admin_logout():
 @app.get("/admin/", response_class=HTMLResponse)
 async def admin_dashboard(request: Request):
     try:
-        admin = require_admin(request)
+        actor = require_editor(request)
     except HTTPException:
         return RedirectResponse("/admin/login")
     with get_db() as conn:
@@ -514,37 +572,43 @@ async def admin_dashboard(request: Request):
             ORDER BY g.created_at DESC
         """).fetchall()
     return templates.TemplateResponse("admin/dashboard.html", {
-        "request": request, "admin": admin, "guides": guides
+        "request": request, "admin": actor, "guides": guides
     })
 
 @app.get("/admin/new", response_class=HTMLResponse)
 async def admin_new_guide(request: Request):
     try:
-        admin = require_admin(request)
+        actor = require_editor(request)
     except HTTPException:
         return RedirectResponse("/admin/login")
-    return templates.TemplateResponse("admin/new_guide.html", {"request": request, "admin": admin})
+    return templates.TemplateResponse("admin/new_guide.html", {"request": request, "admin": actor})
 
 @app.post("/admin/new")
 async def admin_create_guide(
     request: Request,
     title: str = Form(...),
     description: str = Form(""),
+    category: str = Form(""),
     is_published: str = Form("0"),
     cover: UploadFile = File(None),
     files: list[UploadFile] = File([]),
 ):
     try:
-        admin = require_admin(request)
+        actor = require_editor(request)
     except HTTPException:
         return RedirectResponse("/admin/login")
     cover_path = ""
     if cover and cover.filename:
         cover_path = await save_upload(cover)
+
+    # For Google editors, created_by is None (not in admins table)
+    created_by = int(actor["sub"]) if actor.get("is_admin", True) else None
+
     with get_db() as conn:
         cur = conn.execute(
-            "INSERT INTO guides (title, description, cover_image, created_by, is_published) VALUES (?,?,?,?,?)",
-            (title.strip(), description, cover_path, int(admin["sub"]), 1 if is_published == "1" else 0)
+            "INSERT INTO guides (title, description, cover_image, category, created_by, is_published) VALUES (?,?,?,?,?,?)",
+            (title.strip(), description, cover_path, category,
+             created_by, 1 if is_published == "1" else 0)
         )
         guide_id = cur.lastrowid
         for i, f in enumerate(files):
@@ -560,7 +624,7 @@ async def admin_create_guide(
 @app.get("/admin/edit/{guide_id}", response_class=HTMLResponse)
 async def admin_edit_guide(request: Request, guide_id: int):
     try:
-        admin = require_admin(request)
+        actor = require_editor(request)
     except HTTPException:
         return RedirectResponse("/admin/login")
     with get_db() as conn:
@@ -572,7 +636,7 @@ async def admin_edit_guide(request: Request, guide_id: int):
         ).fetchall()
     saved = request.query_params.get("saved") == "1"
     return templates.TemplateResponse("admin/edit_guide.html", {
-        "request": request, "admin": admin, "guide": guide, "files": files, "saved": saved
+        "request": request, "admin": actor, "guide": guide, "files": files, "saved": saved
     })
 
 @app.post("/admin/edit/{guide_id}")
@@ -581,12 +645,13 @@ async def admin_update_guide(
     guide_id: int,
     title: str = Form(...),
     description: str = Form(""),
+    category: str = Form(""),
     is_published: str = Form("0"),
     cover: UploadFile = File(None),
     files: list[UploadFile] = File([]),
 ):
     try:
-        admin = require_admin(request)
+        require_editor(request)
     except HTTPException:
         return RedirectResponse("/admin/login")
     with get_db() as conn:
@@ -597,8 +662,8 @@ async def admin_update_guide(
         if cover and cover.filename:
             cover_path = await save_upload(cover)
         conn.execute(
-            "UPDATE guides SET title=?, description=?, cover_image=?, is_published=?, updated_at=datetime('now') WHERE id=?",
-            (title.strip(), description, cover_path, 1 if is_published == "1" else 0, guide_id)
+            "UPDATE guides SET title=?, description=?, cover_image=?, category=?, is_published=?, updated_at=datetime('now') WHERE id=?",
+            (title.strip(), description, cover_path, category, 1 if is_published == "1" else 0, guide_id)
         )
         existing_count = conn.execute("SELECT COUNT(*) as cnt FROM guide_files WHERE guide_id=?", (guide_id,)).fetchone()["cnt"]
         for i, f in enumerate(files):
@@ -614,7 +679,7 @@ async def admin_update_guide(
 @app.post("/admin/delete/{guide_id}")
 async def admin_delete_guide(request: Request, guide_id: int):
     try:
-        require_admin(request)
+        require_editor(request)
     except HTTPException:
         return RedirectResponse("/admin/login")
     with get_db() as conn:
@@ -631,7 +696,7 @@ async def admin_delete_guide(request: Request, guide_id: int):
 @app.post("/admin/files/delete/{file_id}")
 async def admin_delete_file(request: Request, file_id: int):
     try:
-        require_admin(request)
+        require_editor(request)
     except HTTPException:
         return JSONResponse({"error": "unauthorized"}, status_code=401)
     with get_db() as conn:
@@ -654,8 +719,10 @@ async def admin_admins_page(request: Request):
         raise HTTPException(status_code=403)
     with get_db() as conn:
         admins = conn.execute("SELECT id, username, is_super, created_at FROM admins ORDER BY id").fetchall()
+        editors = conn.execute("SELECT * FROM allowed_editors ORDER BY added_at DESC").fetchall()
     return templates.TemplateResponse("admin/admins.html", {
-        "request": request, "admin": admin, "admins": admins
+        "request": request, "admin": admin, "admins": admins, "editors": editors,
+        "error": None,
     })
 
 @app.post("/admin/admins/add")
@@ -678,8 +745,9 @@ async def admin_add_admin(
                          (username.strip(), hashed, 1 if is_super == "1" else 0))
         except sqlite3.IntegrityError:
             admins = conn.execute("SELECT id, username, is_super, created_at FROM admins ORDER BY id").fetchall()
+            editors = conn.execute("SELECT * FROM allowed_editors ORDER BY added_at DESC").fetchall()
             return templates.TemplateResponse("admin/admins.html", {
-                "request": request, "admin": admin, "admins": admins,
+                "request": request, "admin": admin, "admins": admins, "editors": editors,
                 "error": "שם משתמש כבר קיים"
             })
     return RedirectResponse("/admin/admins?added=1", status_code=302)
@@ -696,6 +764,38 @@ async def admin_remove_admin(request: Request, admin_id: int):
         raise HTTPException(status_code=400, detail="לא ניתן למחוק את עצמך")
     with get_db() as conn:
         conn.execute("DELETE FROM admins WHERE id=?", (admin_id,))
+    return RedirectResponse("/admin/admins", status_code=302)
+
+@app.post("/admin/editors/add")
+async def admin_add_editor(
+    request: Request,
+    email: str = Form(...),
+    label: str = Form(""),
+):
+    try:
+        admin = require_admin(request)
+    except HTTPException:
+        return RedirectResponse("/admin/login")
+    if not admin.get("is_super"):
+        raise HTTPException(status_code=403)
+    with get_db() as conn:
+        try:
+            conn.execute("INSERT INTO allowed_editors (email, label) VALUES (?,?)",
+                         (email.strip().lower(), label.strip()))
+        except sqlite3.IntegrityError:
+            pass  # already exists
+    return RedirectResponse("/admin/admins?editor_added=1", status_code=302)
+
+@app.post("/admin/editors/remove/{editor_id}")
+async def admin_remove_editor(request: Request, editor_id: int):
+    try:
+        admin = require_admin(request)
+    except HTTPException:
+        return RedirectResponse("/admin/login")
+    if not admin.get("is_super"):
+        raise HTTPException(status_code=403)
+    with get_db() as conn:
+        conn.execute("DELETE FROM allowed_editors WHERE id=?", (editor_id,))
     return RedirectResponse("/admin/admins", status_code=302)
 
 @app.get("/admin/profile", response_class=HTMLResponse)
