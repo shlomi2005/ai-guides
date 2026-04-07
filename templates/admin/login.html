@@ -9,50 +9,48 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #0a0a0f; --s1: #111118; --s2: #18181f; --s3: #1e1e28;
-  --b0: rgba(255,255,255,0.05); --b1: rgba(255,255,255,0.09); --b2: rgba(255,255,255,0.18);
-  --acc: #c4a882; --acc-h: #d4bc9a;
-  --t1: #f0ede8; --t2: #8a8a9a; --t3: #55556a;
+  --bg: #e8dccb; --card: #f5efe4; --border: rgba(120,90,50,0.15); --border2: rgba(120,90,50,0.28);
+  --acc: #7c5c2e; --acc-h: #9a7340;
+  --t1: #1c140a; --t2: #6b5740; --t3: #a09078;
 }
-html, body {
-  background: var(--bg); color: var(--t1);
+html, body { background: var(--bg); color: var(--t1);
   font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased;
-  min-height: 100vh; display: flex; align-items: center; justify-content: center;
-}
+  min-height: 100vh; display: flex; align-items: center; justify-content: center; }
 .box {
-  background: var(--s1); border: 1px solid var(--b1);
-  border-radius: 16px; padding: 40px 36px; width: 360px;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 18px; padding: 42px 38px; width: 360px;
+  box-shadow: 0 2px 6px rgba(80,50,20,0.10), 0 12px 40px rgba(80,50,20,0.12);
 }
-.logo-wrap { text-align: center; margin-bottom: 28px; }
+.logo-wrap { text-align: center; margin-bottom: 30px; }
 .logo-mark {
-  width: 44px; height: 44px; border-radius: 11px;
-  background: linear-gradient(135deg, #2a2030, #3d2f50);
-  border: 1px solid rgba(196,168,130,0.25);
+  width: 46px; height: 46px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--acc), var(--acc-h));
   display: inline-flex; align-items: center; justify-content: center;
-  font-size: 1.25rem; margin-bottom: 12px;
+  font-size: 1.3rem; margin-bottom: 13px;
+  box-shadow: 0 2px 8px rgba(124,92,46,0.3);
 }
-.logo-text { font-size: 1.0625rem; font-weight: 700; color: var(--t1); display: block; }
+.logo-text { font-size: 1.0625rem; font-weight: 700; color: var(--t1); display: block; letter-spacing: -0.01em; }
 .logo-sub { font-size: 0.8125rem; color: var(--t3); margin-top: 3px; }
-label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--t3); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 7px; }
+label { display: block; font-size: 0.6875rem; font-weight: 700; color: var(--t3); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 7px; }
 input {
-  width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--b1);
-  border-radius: 8px; padding: 10px 14px; color: var(--t1);
+  width: 100%; background: rgba(255,255,255,0.65); border: 1px solid var(--border);
+  border-radius: 9px; padding: 11px 14px; color: var(--t1);
   font-size: 0.875rem; font-family: inherit; outline: none;
   transition: border-color 150ms, box-shadow 150ms; margin-bottom: 18px;
 }
-input:focus { border-color: var(--b2); box-shadow: 0 0 0 3px rgba(196,168,130,0.1); }
+input:focus { border-color: var(--border2); box-shadow: 0 0 0 3px rgba(124,92,46,0.12); background: #fff; }
 input::placeholder { color: var(--t3); }
 button {
-  width: 100%; background: var(--acc); border: none; border-radius: 8px;
-  padding: 11px; color: #0a0a0f; font-size: 0.875rem; font-weight: 600;
+  width: 100%; background: var(--acc); border: none; border-radius: 9px;
+  padding: 12px; color: #f5efe4; font-size: 0.9375rem; font-weight: 600;
   font-family: inherit; cursor: pointer; transition: background 150ms, transform 150ms;
+  letter-spacing: 0.01em;
 }
 button:hover { background: var(--acc-h); }
 button:active { transform: scale(0.98); }
 .error {
-  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
-  border-radius: 8px; padding: 10px 14px; color: #f87171;
+  background: rgba(180,60,40,0.08); border: 1px solid rgba(180,60,40,0.2);
+  border-radius: 9px; padding: 11px 14px; color: #b03a2a;
   font-size: 0.8125rem; margin-bottom: 18px;
 }
 </style>

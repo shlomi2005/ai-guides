@@ -9,109 +9,79 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg: #0a0a0f; --s1: #111118; --s2: #18181f; --s3: #1e1e28;
-  --b0: rgba(255,255,255,0.05); --b1: rgba(255,255,255,0.09); --b2: rgba(255,255,255,0.18);
-  --acc: #c4a882; --acc-h: #d4bc9a;
-  --t1: #f0ede8; --t2: #8a8a9a; --t3: #55556a;
+  --bg: #e8dccb; --bg2: #dfd3be; --card: #f5efe4; --card2: #ede5d6;
+  --border: rgba(120,90,50,0.13); --border2: rgba(120,90,50,0.25);
+  --acc: #7c5c2e; --acc-h: #9a7340;
+  --t1: #1c140a; --t2: #6b5740; --t3: #a09078;
 }
 html, body { background: var(--bg); color: var(--t1);
   font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
 
-/* Topbar */
 .topbar {
-  position: sticky; top: 0; z-index: 100; height: 52px;
-  background: rgba(10,10,15,0.9); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--b0);
+  position: sticky; top: 0; z-index: 100; height: 54px;
+  background: rgba(232,220,203,0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
   display: flex; align-items: center; padding: 0 24px; gap: 12px;
 }
 .t-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; flex-shrink: 0; }
-.t-logo-mark {
-  width: 26px; height: 26px; border-radius: 6px;
-  background: linear-gradient(135deg, #2a2030, #3d2f50);
-  border: 1px solid rgba(196,168,130,0.2);
-  display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
-}
-.t-logo-text { font-size: 0.8125rem; font-weight: 600; color: var(--t1); }
-.t-sep { width: 1px; height: 18px; background: var(--b1); flex-shrink: 0; }
-.t-back { display: flex; align-items: center; gap: 6px; color: var(--t2); text-decoration: none;
-  font-size: 0.8125rem; font-weight: 500; padding: 5px 10px; border-radius: 6px;
-  transition: background 120ms, color 120ms; }
-.t-back:hover { background: var(--s3); color: var(--t1); }
+.t-logo-mark { width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, var(--acc), var(--acc-h)); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+.t-logo-text { font-size: 0.875rem; font-weight: 700; color: var(--t1); }
+.t-sep { width: 1px; height: 18px; background: var(--border2); flex-shrink: 0; }
+.t-back { display: flex; align-items: center; gap: 6px; color: var(--t2); text-decoration: none; font-size: 0.8125rem; font-weight: 500; padding: 5px 10px; border-radius: 7px; transition: background 120ms, color 120ms; }
+.t-back:hover { background: rgba(124,92,46,0.1); color: var(--t1); }
 .t-crumb { font-size: 0.8125rem; color: var(--t3); }
 
-/* Main */
 .main { max-width: 780px; margin: 0 auto; padding: 40px 24px 80px; }
-.page-h { font-size: 1rem; font-weight: 600; color: var(--t1); margin-bottom: 32px; }
+.page-h { font-size: 1rem; font-weight: 700; color: var(--t1); margin-bottom: 28px; letter-spacing: -0.01em; }
 
-/* Form */
-.form-group { margin-bottom: 26px; }
-label { display: block; font-size: 0.6875rem; font-weight: 600; color: var(--t3);
-  letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
+.form-group { margin-bottom: 24px; }
+label { display: block; font-size: 0.6875rem; font-weight: 700; color: var(--t3); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
 input[type=text], textarea {
-  width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--b1);
+  width: 100%; background: rgba(255,255,255,0.65); border: 1px solid var(--border);
   border-radius: 9px; padding: 11px 14px; color: var(--t1);
   font-size: 0.875rem; font-family: inherit; outline: none;
   transition: border-color 150ms, box-shadow 150ms;
 }
-input[type=text]:focus, textarea:focus {
-  border-color: var(--b2); box-shadow: 0 0 0 3px rgba(196,168,130,0.08);
-}
-input[type=text]::placeholder, textarea::placeholder { color: var(--t3); }
-textarea { min-height: 320px; resize: vertical; line-height: 1.65;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace; font-size: 0.8125rem; }
+input[type=text]:focus, textarea:focus { border-color: var(--border2); box-shadow: 0 0 0 3px rgba(124,92,46,0.1); background: #fff; }
+input::placeholder, textarea::placeholder { color: var(--t3); }
+textarea { min-height: 320px; resize: vertical; line-height: 1.65; font-family: 'JetBrains Mono','Courier New',monospace; font-size: 0.8125rem; }
 .hint { font-size: 0.75rem; color: var(--t3); margin-top: 7px; }
 
-/* File drop */
 .file-drop {
-  border: 1px dashed var(--b1); border-radius: 10px;
-  padding: 28px 20px; text-align: center;
-  cursor: pointer; transition: border-color 150ms, background 150ms;
-  background: var(--s1);
+  border: 1px dashed var(--border2); border-radius: 10px; padding: 28px 20px;
+  text-align: center; cursor: pointer;
+  transition: border-color 150ms, background 150ms; background: rgba(255,255,255,0.4);
 }
-.file-drop:hover, .file-drop.dragover { border-color: var(--acc); background: rgba(196,168,130,0.04); }
-.file-drop-icon { font-size: 1.5rem; margin-bottom: 7px; opacity: 0.4; }
+.file-drop:hover, .file-drop.dragover { border-color: var(--acc); background: rgba(255,255,255,0.7); }
+.file-drop-icon { font-size: 1.5rem; margin-bottom: 7px; opacity: 0.5; }
 .file-drop p { font-size: 0.8125rem; color: var(--t3); }
 .file-drop input[type=file] { display: none; }
 .selected-files { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
-.selected-file {
-  background: var(--s1); border: 1px solid var(--b0); border-radius: 8px;
-  padding: 9px 13px; display: flex; justify-content: space-between;
-  font-size: 0.8125rem; color: var(--t2);
-}
-.cover-preview { margin-top: 12px; max-width: 280px; border-radius: 8px; border: 1px solid var(--b1); display: none; }
+.selected-file { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 9px 13px; display: flex; justify-content: space-between; font-size: 0.8125rem; color: var(--t2); }
+.cover-preview { margin-top: 12px; max-width: 280px; border-radius: 8px; border: 1px solid var(--border); display: none; }
 
-/* Toggle */
 .toggle-group { display: flex; align-items: center; gap: 12px; }
 .toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
 .toggle input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; inset: 0; background: var(--s3); border-radius: 12px; cursor: pointer; transition: background 150ms; border: 1px solid var(--b1); }
+.slider { position: absolute; inset: 0; background: var(--card2); border: 1px solid var(--border2); border-radius: 12px; cursor: pointer; transition: background 150ms; }
 .slider:before { content: ''; position: absolute; width: 18px; height: 18px; bottom: 2px; right: 2px; background: var(--t3); border-radius: 50%; transition: transform 150ms, background 150ms; }
-.toggle input:checked + .slider { background: rgba(196,168,130,0.2); border-color: rgba(196,168,130,0.4); }
+.toggle input:checked + .slider { background: rgba(124,92,46,0.2); border-color: rgba(124,92,46,0.5); }
 .toggle input:checked + .slider:before { transform: translateX(-20px); background: var(--acc); }
 .toggle-label { font-size: 0.875rem; color: var(--t2); }
 
-/* Submit */
-.btn-submit {
-  background: var(--acc); border: none; border-radius: 8px;
-  padding: 11px 28px; color: #0a0a0f; font-size: 0.875rem; font-weight: 600;
-  font-family: inherit; cursor: pointer; transition: background 150ms, transform 150ms;
-}
+.btn-submit { background: var(--acc); border: none; border-radius: 9px; padding: 11px 30px; color: #f5efe4; font-size: 0.9rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 150ms, transform 150ms; }
 .btn-submit:hover { background: var(--acc-h); }
 .btn-submit:active { transform: scale(0.98); }
 
-.hr { height: 1px; background: var(--b0); margin: 32px 0; }
+.hr { height: 1px; background: var(--border); margin: 28px 0; }
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--b1); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
 </style>
 </head>
 <body>
-
 <div class="topbar">
-  <a class="t-logo" href="/">
-    <div class="t-logo-mark">🤖</div>
-    <span class="t-logo-text">מדריכי AI</span>
-  </a>
+  <a class="t-logo" href="/"><div class="t-logo-mark">🤖</div><span class="t-logo-text">מדריכי AI</span></a>
   <div class="t-sep"></div>
   <a class="t-back" href="/admin/">← לוח בקרה</a>
   <div class="t-sep"></div>
@@ -129,7 +99,7 @@ textarea { min-height: 320px; resize: vertical; line-height: 1.65;
 
     <div class="form-group">
       <label>תוכן המדריך</label>
-      <textarea name="description" placeholder="כתוב את תוכן המדריך כאן...&#10;&#10;ניתן להשתמש ב-HTML:&#10;&lt;h2&gt;כותרת&lt;/h2&gt; &lt;p&gt;פסקה&lt;/p&gt; &lt;strong&gt; &lt;img&gt; &lt;ul&gt; &lt;pre&gt;&lt;code&gt;"></textarea>
+      <textarea name="description" placeholder="כתוב את תוכן המדריך כאן...&#10;&#10;ניתן להשתמש ב-HTML:&#10;&lt;h2&gt;כותרת&lt;/h2&gt; &lt;p&gt;פסקה&lt;/p&gt;"></textarea>
       <div class="hint">HTML מותר: &lt;h2&gt; &lt;h3&gt; &lt;p&gt; &lt;strong&gt; &lt;em&gt; &lt;a&gt; &lt;img&gt; &lt;ul&gt; &lt;ol&gt; &lt;pre&gt; &lt;code&gt; &lt;blockquote&gt;</div>
     </div>
 
@@ -142,7 +112,7 @@ textarea { min-height: 320px; resize: vertical; line-height: 1.65;
         <p>לחץ לבחירת תמונה (JPG, PNG, WEBP)</p>
         <input id="coverInput" type="file" name="cover" accept="image/*" onchange="previewCover(this)">
       </div>
-      <img id="coverPreview" class="cover-preview" alt="תצוגה מקדימה">
+      <img id="coverPreview" class="cover-preview" alt="">
     </div>
 
     <div class="form-group">
@@ -159,10 +129,7 @@ textarea { min-height: 320px; resize: vertical; line-height: 1.65;
 
     <div class="form-group">
       <div class="toggle-group">
-        <label class="toggle">
-          <input type="checkbox" name="is_published" value="1" checked>
-          <span class="slider"></span>
-        </label>
+        <label class="toggle"><input type="checkbox" name="is_published" value="1" checked><span class="slider"></span></label>
         <span class="toggle-label">פרסם מיד</span>
       </div>
     </div>
@@ -170,20 +137,17 @@ textarea { min-height: 320px; resize: vertical; line-height: 1.65;
     <button type="submit" class="btn-submit">צור מדריך</button>
   </form>
 </div>
-
 <script>
 function previewCover(input) {
   const img = document.getElementById('coverPreview');
   if (input.files[0]) { img.src = URL.createObjectURL(input.files[0]); img.style.display = 'block'; }
 }
 function showFiles(input) {
-  const container = document.getElementById('selectedFiles');
-  container.innerHTML = '';
+  const c = document.getElementById('selectedFiles'); c.innerHTML = '';
   [...input.files].forEach(f => {
-    const div = document.createElement('div');
-    div.className = 'selected-file';
-    div.innerHTML = `<span>${f.name}</span><span>${(f.size/1024/1024).toFixed(1)} MB</span>`;
-    container.appendChild(div);
+    const d = document.createElement('div'); d.className = 'selected-file';
+    d.innerHTML = `<span>${f.name}</span><span>${(f.size/1024/1024).toFixed(1)} MB</span>`;
+    c.appendChild(d);
   });
 }
 const drop = document.getElementById('fileDrop');
