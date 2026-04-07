@@ -167,6 +167,9 @@ def get_file_icon(filename: str) -> str:
 
 templates.env.globals["get_file_icon"] = get_file_icon
 
+import json as _json
+templates.env.filters["tojson"] = lambda v: _json.dumps(v, ensure_ascii=False)
+
 
 # ─── Public Routes ────────────────────────────────────────────────────────────
 
