@@ -107,6 +107,7 @@ td { padding: 13px 16px; font-size: 0.8125rem; vertical-align: middle; }
   <div class="t-actions">
     <span class="t-user">שלום, <strong>{{ admin.username }}</strong></span>
     {% if admin.is_super %}<a href="/admin/admins" class="btn btn-ghost btn-sm">👥 אדמינים</a>{% endif %}
+    <a href="/admin/profile" class="btn btn-ghost btn-sm">👤 פרופיל</a>
     <a href="/" class="btn btn-ghost btn-sm">🌐 אתר</a>
     <a href="/admin/logout" class="btn btn-ghost btn-sm">יציאה</a>
   </div>
@@ -126,7 +127,7 @@ td { padding: 13px 16px; font-size: 0.8125rem; vertical-align: middle; }
     <table>
       <thead>
         <tr>
-          <th>#</th><th>כותרת</th><th>סטטוס</th><th>קבצים</th><th>תאריך</th><th></th>
+          <th>#</th><th>כותרת</th><th>סטטוס</th><th>קבצים</th><th>צפיות</th><th>תאריך</th><th></th>
         </tr>
       </thead>
       <tbody>
@@ -142,6 +143,7 @@ td { padding: 13px 16px; font-size: 0.8125rem; vertical-align: middle; }
             {% endif %}
           </td>
           <td class="td-meta">{{ g.file_count }}</td>
+          <td class="td-meta">{{ g.view_count or 0 }}</td>
           <td class="td-meta">{{ g.created_at[:10] }}</td>
           <td>
             <div class="row-actions">

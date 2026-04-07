@@ -9,87 +9,72 @@
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg:      #e8dccb;
-  --bg2:     #dfd3be;
-  --card:    #f5efe4;
-  --card2:   #ede5d6;
-  --border:  rgba(120,90,50,0.13);
-  --border2: rgba(120,90,50,0.25);
-  --acc:     #7c5c2e;
-  --acc-h:   #9a7340;
-  --acc-dim: rgba(124,92,46,0.10);
-  --t1:      #1c140a;
-  --t2:      #6b5740;
-  --t3:      #a09078;
-  --shadow:  0 1px 3px rgba(80,50,20,0.10), 0 6px 20px rgba(80,50,20,0.08);
+  --bg: #e8dccb; --bg2: #dfd3be; --card: #f5efe4; --card2: #ede5d6;
+  --border: rgba(120,90,50,0.13); --border2: rgba(120,90,50,0.25);
+  --acc: #7c5c2e; --acc-h: #9a7340; --acc-dim: rgba(124,92,46,0.10);
+  --t1: #1c140a; --t2: #6b5740; --t3: #a09078;
+  --shadow: 0 1px 3px rgba(80,50,20,0.10), 0 6px 20px rgba(80,50,20,0.08);
   --shadow-sm: 0 1px 3px rgba(80,50,20,0.12);
 }
 html, body { background: var(--bg); color: var(--t1);
   font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
 
+/* ── Progress bar ──────────────────── */
+.progress-bar { position: fixed; top: 54px; right: 0; left: 0; height: 2px; background: var(--border); z-index: 99; }
+.progress-fill { height: 100%; background: var(--acc); width: 0%; transition: width 60ms linear; }
+
 /* ── Topbar ─────────────────────────── */
 .topbar {
-  position: sticky; top: 0; z-index: 100;
-  height: 54px; background: rgba(232,220,203,0.88);
-  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  position: sticky; top: 0; z-index: 100; height: 54px;
+  background: rgba(232,220,203,0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center; padding: 0 20px; gap: 12px;
 }
 .t-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; flex-shrink: 0; }
-.t-logo-mark {
-  width: 28px; height: 28px; border-radius: 7px;
-  background: linear-gradient(135deg, var(--acc), var(--acc-h));
-  display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
-}
+.t-logo-mark { width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, var(--acc), var(--acc-h)); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
 .t-logo-text { font-size: 0.875rem; font-weight: 700; color: var(--t1); }
 .t-sep { width: 1px; height: 18px; background: var(--border2); flex-shrink: 0; }
-.t-back {
-  display: flex; align-items: center; gap: 6px; color: var(--t2); text-decoration: none;
-  font-size: 0.8125rem; font-weight: 500; padding: 5px 10px; border-radius: 7px;
-  transition: background 120ms, color 120ms; white-space: nowrap;
-}
+.t-back { display: flex; align-items: center; gap: 6px; color: var(--t2); text-decoration: none; font-size: 0.8125rem; font-weight: 500; padding: 5px 10px; border-radius: 7px; transition: background 120ms, color 120ms; white-space: nowrap; }
 .t-back:hover { background: rgba(124,92,46,0.1); color: var(--t1); }
 .t-crumb { font-size: 0.8125rem; color: var(--t3); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.t-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.t-btn { font-size: 0.8125rem; color: var(--t3); background: transparent; border: none; cursor: pointer; padding: 5px 8px; border-radius: 6px; font-family: inherit; transition: background 120ms, color 120ms; }
+.t-btn:hover { background: rgba(124,92,46,0.1); color: var(--t1); }
+.t-btn.bookmarked { color: var(--acc); }
 
 /* ── Hero ───────────────────────────── */
-.hero {
-  position: relative; width: 100%; aspect-ratio: 21/7; overflow: hidden;
-  background: var(--card2); max-height: 340px;
-}
+.hero { position: relative; width: 100%; aspect-ratio: 21/7; overflow: hidden; background: var(--card2); max-height: 340px; }
 .hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.hero-scrim {
-  position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(28,20,10,0.85) 0%, rgba(28,20,10,0.2) 50%, transparent 100%);
-}
-.hero-placeholder {
-  width: 100%; height: 100%;
-  background: linear-gradient(135deg, var(--card2) 0%, var(--bg2) 100%);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 3.5rem; opacity: 0.3;
-}
-.hero-content {
-  position: absolute; bottom: 0; right: 0; left: 0;
-  padding: 0 40px 28px; max-width: 760px; margin: 0 auto; right: auto;
-}
-.hero-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.hero-scrim { position: absolute; inset: 0; background: linear-gradient(to top, rgba(28,20,10,0.85) 0%, rgba(28,20,10,0.2) 50%, transparent 100%); }
+.hero-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, var(--card2) 0%, var(--bg2) 100%); display: flex; align-items: center; justify-content: center; font-size: 3.5rem; opacity: 0.3; }
+.hero-content { position: absolute; bottom: 0; right: 0; left: 0; padding: 0 40px 28px; max-width: 760px; margin: 0 auto; right: auto; }
+.hero-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
 .hero-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--acc-h); flex-shrink: 0; }
-.hero-date { font-size: 0.75rem; font-weight: 500; color: rgba(245,239,228,0.75); letter-spacing: 0.02em; }
-.hero-title {
-  font-size: clamp(1.25rem, 3vw, 1.875rem); font-weight: 700;
-  line-height: 1.25; letter-spacing: -0.02em; color: #f5efe4;
-  text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+.hero-date { font-size: 0.75rem; font-weight: 500; color: rgba(245,239,228,0.75); }
+.hero-views { font-size: 0.75rem; color: rgba(245,239,228,0.6); }
+.hero-title { font-size: clamp(1.25rem, 3vw, 1.875rem); font-weight: 700; line-height: 1.25; letter-spacing: -0.02em; color: #f5efe4; text-shadow: 0 2px 20px rgba(0,0,0,0.5); }
+
+/* ── Author strip ───────────────────── */
+.author-strip {
+  max-width: 720px; margin: 0 auto; padding: 18px 24px 0;
+  display: flex; align-items: center; gap: 12px;
 }
+.author-avatar {
+  width: 38px; height: 38px; border-radius: 50%; object-fit: cover;
+  border: 2px solid var(--border2); flex-shrink: 0;
+  background: var(--card2); display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; overflow: hidden;
+}
+.author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.author-name { font-size: 0.875rem; font-weight: 600; color: var(--t1); }
+.author-label { font-size: 0.75rem; color: var(--t3); }
 
 /* ── Article ────────────────────────── */
-.article { max-width: 720px; margin: 0 auto; padding: 40px 24px 120px; }
+.article { max-width: 720px; margin: 0 auto; padding: 28px 24px 120px; }
 
 /* ── Body ───────────────────────────── */
 .body-text { font-size: 0.9375rem; line-height: 1.85; color: var(--t2); }
-.body-text h1,.body-text h2 {
-  color: var(--t1); font-size: 1.125rem; font-weight: 700;
-  letter-spacing: -0.01em; margin: 36px 0 14px;
-  padding-bottom: 10px; border-bottom: 1px solid var(--border);
-}
+.body-text h1,.body-text h2 { color: var(--t1); font-size: 1.125rem; font-weight: 700; letter-spacing: -0.01em; margin: 36px 0 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
 .body-text h3 { color: var(--t1); font-size: 1rem; font-weight: 600; margin: 24px 0 10px; }
 .body-text p { margin-bottom: 18px; }
 .body-text a { color: var(--acc); text-decoration: underline; text-decoration-color: rgba(124,92,46,0.35); text-underline-offset: 3px; }
@@ -97,41 +82,33 @@ html, body { background: var(--bg); color: var(--t1);
 .body-text img { max-width: 100%; border-radius: 10px; border: 1px solid var(--border); margin: 20px 0; display: block; }
 .body-text ul,.body-text ol { padding-right: 22px; margin-bottom: 18px; }
 .body-text li { margin-bottom: 7px; }
-.body-text blockquote {
-  border-right: 2px solid var(--acc); padding-right: 18px;
-  margin: 24px 0; color: var(--t3); font-style: italic;
-}
-.body-text pre {
-  background: var(--card2); border: 1px solid var(--border2); border-radius: 10px;
-  padding: 18px 20px; overflow-x: auto; margin: 20px 0;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
-  font-size: 0.8125rem; line-height: 1.6; color: var(--t1);
-}
-.body-text code {
-  background: var(--card2); border: 1px solid var(--border);
-  padding: 2px 6px; border-radius: 5px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
-  font-size: 0.8125rem; color: var(--acc);
-}
+.body-text blockquote { border-right: 2px solid var(--acc); padding-right: 18px; margin: 24px 0; color: var(--t3); font-style: italic; }
+.body-text pre { background: var(--card2); border: 1px solid var(--border2); border-radius: 10px; padding: 18px 20px; overflow-x: auto; margin: 20px 0; font-family: 'JetBrains Mono','Courier New',monospace; font-size: 0.8125rem; line-height: 1.6; color: var(--t1); }
+.body-text code { background: var(--card2); border: 1px solid var(--border); padding: 2px 6px; border-radius: 5px; font-family: 'JetBrains Mono','Courier New',monospace; font-size: 0.8125rem; color: var(--acc); }
 .body-text pre code { background: none; border: none; padding: 0; color: inherit; }
 
 /* ── Divider ────────────────────────── */
 .hr { height: 1px; background: var(--border); margin: 32px 0; }
 
+/* ── Share row ──────────────────────── */
+.share-row { display: flex; gap: 8px; margin-bottom: 24px; }
+.share-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border2);
+  font-size: 0.8125rem; font-weight: 500; cursor: pointer; font-family: inherit;
+  text-decoration: none; transition: background 120ms, transform 120ms;
+  background: var(--card);
+}
+.share-btn:hover { background: #faf6ef; transform: translateY(-1px); }
+.share-btn:active { transform: scale(0.97); }
+.share-wa { color: #25d366; border-color: rgba(37,211,102,0.3); }
+.share-copy { color: var(--t2); }
+.share-copy.copied { color: var(--acc); border-color: rgba(124,92,46,0.3); }
+
 /* ── Files ──────────────────────────── */
-.sec-label {
-  font-size: 0.6875rem; font-weight: 700; color: var(--t3);
-  letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 12px;
-}
+.sec-label { font-size: 0.6875rem; font-weight: 700; color: var(--t3); letter-spacing: 0.07em; text-transform: uppercase; margin-bottom: 12px; }
 .files { display: flex; flex-direction: column; gap: 6px; }
-.file-row {
-  display: flex; align-items: center; gap: 12px;
-  padding: 11px 14px; border-radius: 10px;
-  background: var(--card); border: 1px solid var(--border);
-  text-decoration: none; color: inherit;
-  transition: background 120ms, border-color 120ms, box-shadow 120ms;
-  box-shadow: var(--shadow-sm);
-}
+.file-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 10px; background: var(--card); border: 1px solid var(--border); text-decoration: none; color: inherit; transition: background 120ms, border-color 120ms, box-shadow 120ms; box-shadow: var(--shadow-sm); }
 .file-row:hover { background: #faf6ef; border-color: var(--border2); box-shadow: var(--shadow); }
 .file-ic { font-size: 1.1rem; flex-shrink: 0; }
 .file-name { font-size: 0.8125rem; font-weight: 500; color: var(--t1); flex: 1; }
@@ -139,26 +116,18 @@ html, body { background: var(--bg); color: var(--t1);
 .file-dl { font-size: 0.75rem; color: var(--acc); opacity: 0; transition: opacity 120ms; }
 .file-row:hover .file-dl { opacity: 1; }
 
+/* ── Related ────────────────────────── */
+.related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.related-card { display: block; text-decoration: none; background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; transition: box-shadow 120ms, transform 120ms; box-shadow: var(--shadow-sm); }
+.related-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+.related-thumb { width: 100%; height: 80px; object-fit: cover; background: var(--card2); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; opacity: 0.4; overflow: hidden; }
+.related-thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 1; }
+.related-title { padding: 10px 12px; font-size: 0.8125rem; font-weight: 600; color: var(--t1); line-height: 1.3; }
+
 /* ── Reactions ──────────────────────── */
-.reactions-bar {
-  position: fixed; bottom: 0; right: 0; left: 0; z-index: 50;
-  padding: 14px 0 18px;
-  background: linear-gradient(to top, rgba(232,220,203,1) 60%, transparent 100%);
-  display: flex; justify-content: center;
-}
-.reactions-inner {
-  display: flex; gap: 6px; align-items: center;
-  background: var(--card); border: 1px solid var(--border2);
-  border-radius: 28px; padding: 6px 12px;
-  box-shadow: 0 4px 24px rgba(80,50,20,0.18);
-}
-.r-btn {
-  display: flex; align-items: center; gap: 5px;
-  background: transparent; border: 1px solid transparent;
-  border-radius: 20px; padding: 5px 11px;
-  font-size: 0.9rem; cursor: pointer; color: var(--t1);
-  transition: background 120ms, border-color 120ms, transform 120ms;
-}
+.reactions-bar { position: fixed; bottom: 0; right: 0; left: 0; z-index: 50; padding: 14px 0 18px; background: linear-gradient(to top, rgba(232,220,203,1) 60%, transparent 100%); display: flex; justify-content: center; }
+.reactions-inner { display: flex; gap: 6px; align-items: center; background: var(--card); border: 1px solid var(--border2); border-radius: 28px; padding: 6px 12px; box-shadow: 0 4px 24px rgba(80,50,20,0.18); }
+.r-btn { display: flex; align-items: center; gap: 5px; background: transparent; border: 1px solid transparent; border-radius: 20px; padding: 5px 11px; font-size: 0.9rem; cursor: pointer; color: var(--t1); transition: background 120ms, border-color 120ms, transform 120ms; }
 .r-btn:hover { background: var(--card2); border-color: var(--border); transform: scale(1.06); }
 .r-btn:active { transform: scale(0.96); }
 .r-btn.active { background: var(--acc-dim); border-color: rgba(124,92,46,0.3); }
@@ -166,14 +135,7 @@ html, body { background: var(--bg); color: var(--t1);
 .r-btn.active .r-cnt { color: var(--acc); }
 
 /* ── Toast ──────────────────────────── */
-.toast {
-  position: fixed; top: 68px; left: 50%; transform: translateX(-50%);
-  background: var(--t1); color: var(--card);
-  border-radius: 8px; padding: 8px 18px;
-  font-size: 0.8125rem; font-weight: 500;
-  opacity: 0; transition: opacity 200ms; pointer-events: none; z-index: 999;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-}
+.toast { position: fixed; top: 68px; left: 50%; transform: translateX(-50%); background: var(--t1); color: var(--card); border-radius: 8px; padding: 8px 18px; font-size: 0.8125rem; font-weight: 500; opacity: 0; transition: opacity 200ms; pointer-events: none; z-index: 999; box-shadow: 0 4px 16px rgba(0,0,0,0.25); white-space: nowrap; }
 .toast.show { opacity: 1; }
 
 ::-webkit-scrollbar { width: 5px; }
@@ -182,6 +144,8 @@ html, body { background: var(--bg); color: var(--t1);
 </style>
 </head>
 <body>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
 
 <div class="topbar">
   <a class="t-logo" href="/">
@@ -192,6 +156,9 @@ html, body { background: var(--bg); color: var(--t1);
   <a class="t-back" href="/">← חזרה</a>
   <div class="t-sep"></div>
   <div class="t-crumb">{{ guide.title }}</div>
+  <div class="t-actions">
+    <button class="t-btn" id="bookmarkBtn" onclick="toggleBookmark()" title="שמור לסימניות">☆ שמור</button>
+  </div>
 </div>
 
 {% if guide.cover_image %}
@@ -202,6 +169,7 @@ html, body { background: var(--bg); color: var(--t1);
     <div class="hero-meta">
       <div class="hero-dot"></div>
       <span class="hero-date">{{ guide.created_at[:10] }}</span>
+      {% if guide.view_count %}<span class="hero-views">· {{ guide.view_count }} צפיות</span>{% endif %}
     </div>
     <h1 class="hero-title">{{ guide.title }}</h1>
   </div>
@@ -214,13 +182,40 @@ html, body { background: var(--bg); color: var(--t1);
     <div class="hero-meta">
       <div class="hero-dot"></div>
       <span class="hero-date">{{ guide.created_at[:10] }}</span>
+      {% if guide.view_count %}<span class="hero-views">· {{ guide.view_count }} צפיות</span>{% endif %}
     </div>
     <h1 class="hero-title">{{ guide.title }}</h1>
   </div>
 </div>
 {% endif %}
 
+{% if guide.author_name %}
+<div class="author-strip">
+  <div class="author-avatar">
+    {% if guide.author_avatar %}
+    <img src="/files/{{ guide.author_avatar }}" alt="{{ guide.author_name }}">
+    {% else %}
+    👤
+    {% endif %}
+  </div>
+  <div>
+    <div class="author-name">{{ guide.author_name }}</div>
+    <div class="author-label">מדריך AI</div>
+  </div>
+</div>
+{% endif %}
+
 <div class="article">
+  <!-- Share row -->
+  <div class="share-row">
+    <a class="share-btn share-wa" href="https://wa.me/?text={{ guide.title | urlencode }}%20{{ (base_url ~ '/guide/' ~ guide.id) | urlencode }}" target="_blank" rel="noopener">
+      <span>💬</span> שתף בוואטסאפ
+    </a>
+    <button class="share-btn share-copy" id="copyBtn" onclick="copyLink()">
+      <span>🔗</span> העתק קישור
+    </button>
+  </div>
+
   <div class="body-text">{{ guide.description | safe }}</div>
 
   {% if files %}
@@ -233,6 +228,23 @@ html, body { background: var(--bg); color: var(--t1);
       <span class="file-name">{{ f.original_name }}</span>
       <span class="file-sz">{{ f.file_size | fmt_size }}</span>
       <span class="file-dl">⬇</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if related %}
+  <div class="hr"></div>
+  <div class="sec-label">מדריכים נוספים</div>
+  <div class="related-grid">
+    {% for r in related %}
+    <a class="related-card" href="/guide/{{ r.id }}">
+      <div class="related-thumb">
+        {% if r.cover_image %}
+        <img src="/files/{{ r.cover_image }}" alt="">
+        {% else %}🤖{% endif %}
+      </div>
+      <div class="related-title">{{ r.title }}</div>
     </a>
     {% endfor %}
   </div>
@@ -254,9 +266,11 @@ html, body { background: var(--bg); color: var(--t1);
 
 <script>
 const guideId = {{ guide.id }};
+const guideUrl = window.location.href;
 const EMOJIS = {{ allowed_emojis | tojson }};
 const myR = new Set(JSON.parse(localStorage.getItem('r_' + guideId) || '[]'));
 
+// Reactions state
 document.querySelectorAll('.r-btn').forEach(btn => {
   if (myR.has(btn.dataset.emoji)) btn.classList.add('active');
 });
@@ -270,15 +284,49 @@ async function react(emoji) {
   const i = EMOJIS.indexOf(emoji);
   const btn = document.querySelectorAll('.r-btn')[i];
   document.getElementById('rc-' + i).textContent = d.count > 0 ? d.count : '';
-  if (d.action === 'added') { btn.classList.add('active'); myR.add(emoji); toast(emoji + ' תודה'); }
+  if (d.action === 'added') { btn.classList.add('active'); myR.add(emoji); toast(emoji + ' תודה!'); }
   else { btn.classList.remove('active'); myR.delete(emoji); }
   localStorage.setItem('r_' + guideId, JSON.stringify([...myR]));
+}
+
+// Progress bar
+window.addEventListener('scroll', () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  const p = h > 0 ? (window.scrollY / h) * 100 : 0;
+  document.getElementById('progress').style.width = p + '%';
+});
+
+// Bookmark
+const BOOKMARKS_KEY = 'ai_bookmarks';
+function getBookmarks() { return JSON.parse(localStorage.getItem(BOOKMARKS_KEY) || '[]'); }
+function updateBookmarkBtn(saved) {
+  const btn = document.getElementById('bookmarkBtn');
+  btn.textContent = saved ? '★ נשמר' : '☆ שמור';
+  btn.classList.toggle('bookmarked', saved);
+}
+function toggleBookmark() {
+  const bm = getBookmarks();
+  const idx = bm.indexOf(guideId);
+  if (idx === -1) { bm.push(guideId); toast('נשמר לסימניות ★'); updateBookmarkBtn(true); }
+  else { bm.splice(idx, 1); updateBookmarkBtn(false); }
+  localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(bm));
+}
+updateBookmarkBtn(getBookmarks().includes(guideId));
+
+// Copy link
+function copyLink() {
+  navigator.clipboard.writeText(guideUrl).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.classList.add('copied');
+    btn.innerHTML = '<span>✓</span> הועתק!';
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '<span>🔗</span> העתק קישור'; }, 2000);
+  });
 }
 
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 1600);
+  setTimeout(() => t.classList.remove('show'), 1800);
 }
 </script>
 </body>

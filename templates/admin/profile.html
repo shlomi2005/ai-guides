@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>פרופיל — מדריכי AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #e8dccb; --card: #f5efe4; --card2: #ede5d6;
+  --border: rgba(120,90,50,0.13); --border2: rgba(120,90,50,0.25);
+  --acc: #7c5c2e; --acc-h: #9a7340;
+  --t1: #1c140a; --t2: #6b5740; --t3: #a09078;
+}
+html, body { background: var(--bg); color: var(--t1);
+  font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.topbar { position: sticky; top: 0; z-index: 100; height: 54px; background: rgba(232,220,203,0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 12px; }
+.t-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; flex-shrink: 0; }
+.t-logo-mark { width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, var(--acc), var(--acc-h)); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+.t-logo-text { font-size: 0.875rem; font-weight: 700; color: var(--t1); }
+.t-sep { width: 1px; height: 18px; background: var(--border2); flex-shrink: 0; }
+.t-back { display: flex; align-items: center; gap: 6px; color: var(--t2); text-decoration: none; font-size: 0.8125rem; font-weight: 500; padding: 5px 10px; border-radius: 7px; transition: background 120ms, color 120ms; }
+.t-back:hover { background: rgba(124,92,46,0.1); color: var(--t1); }
+.t-crumb { font-size: 0.8125rem; color: var(--t3); }
+
+.main { max-width: 480px; margin: 0 auto; padding: 48px 24px 80px; }
+
+.profile-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 32px; box-shadow: 0 2px 6px rgba(80,50,20,0.08); }
+.avatar-current {
+  width: 88px; height: 88px; border-radius: 50%; margin: 0 auto 20px;
+  border: 3px solid var(--border2); display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; background: var(--card2); overflow: hidden;
+}
+.avatar-current img { width: 100%; height: 100%; object-fit: cover; }
+.profile-name { font-size: 1.125rem; font-weight: 700; color: var(--t1); text-align: center; margin-bottom: 4px; letter-spacing: -0.01em; }
+.profile-role { font-size: 0.8125rem; color: var(--t3); text-align: center; margin-bottom: 28px; }
+
+.banner-saved { background: rgba(50,140,80,0.1); border: 1px solid rgba(50,140,80,0.25); color: #276b3a; border-radius: 9px; padding: 11px 16px; font-size: 0.8125rem; margin-bottom: 22px; text-align: center; }
+
+label { display: block; font-size: 0.6875rem; font-weight: 700; color: var(--t3); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; }
+.file-drop { border: 1px dashed var(--border2); border-radius: 10px; padding: 28px 20px; text-align: center; cursor: pointer; transition: border-color 150ms, background 150ms; background: rgba(255,255,255,0.4); }
+.file-drop:hover { border-color: var(--acc); background: rgba(255,255,255,0.7); }
+.file-drop-icon { font-size: 1.5rem; margin-bottom: 7px; opacity: 0.5; }
+.file-drop p { font-size: 0.8125rem; color: var(--t3); }
+.file-drop input { display: none; }
+.preview-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 12px auto 0; display: none; border: 2px solid var(--border2); }
+
+.btn-submit { width: 100%; background: var(--acc); border: none; border-radius: 9px; padding: 12px; color: #f5efe4; font-size: 0.9rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 150ms, transform 150ms; margin-top: 20px; }
+.btn-submit:hover { background: var(--acc-h); }
+.btn-submit:active { transform: scale(0.98); }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a class="t-logo" href="/"><div class="t-logo-mark">🤖</div><span class="t-logo-text">מדריכי AI</span></a>
+  <div class="t-sep"></div>
+  <a class="t-back" href="/admin/">← לוח בקרה</a>
+  <div class="t-sep"></div>
+  <span class="t-crumb">פרופיל</span>
+</div>
+
+<div class="main">
+  <div class="profile-card">
+    <div class="avatar-current">
+      {% if admin_row and admin_row['avatar'] %}
+      <img src="/files/{{ admin_row['avatar'] }}" alt="אווטאר">
+      {% else %}
+      👤
+      {% endif %}
+    </div>
+    <div class="profile-name">{{ admin_row['username'] if admin_row else admin.username }}</div>
+    <div class="profile-role">{% if admin.is_super %}אדמין ראשי{% else %}אדמין{% endif %}</div>
+
+    {% if saved %}<div class="banner-saved">תמונת הפרופיל עודכנה בהצלחה</div>{% endif %}
+
+    <form method="post" enctype="multipart/form-data">
+      <label>תמונת פרופיל</label>
+      <div class="file-drop" onclick="document.getElementById('avatarInput').click()">
+        <div class="file-drop-icon">📷</div>
+        <p>לחץ לבחירת תמונה (JPG, PNG, WEBP)</p>
+        <input id="avatarInput" type="file" name="avatar" accept="image/*" onchange="previewAvatar(this)">
+      </div>
+      <img id="previewImg" class="preview-img" alt="">
+      <button type="submit" class="btn-submit">שמור תמונת פרופיל</button>
+    </form>
+  </div>
+</div>
+
+<script>
+function previewAvatar(input) {
+  const img = document.getElementById('previewImg');
+  if (input.files[0]) { img.src = URL.createObjectURL(input.files[0]); img.style.display = 'block'; }
+}
+</script>
+</body>
+</html>

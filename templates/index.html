@@ -174,6 +174,14 @@ html, body {
     <span class="t-search-icon">🔍</span>
     <input id="searchInput" type="text" placeholder="חיפוש מדריכים..." oninput="search(this.value)">
   </div>
+  {% if member_count > 0 %}
+  <div style="font-size:0.75rem;color:var(--t3);white-space:nowrap;flex-shrink:0">
+    👥 <strong style="color:var(--t2)">{{ member_count }}</strong> חברים
+  </div>
+  {% endif %}
+  {% if current_user %}
+  <a href="/auth/logout" style="font-size:0.75rem;color:var(--t3);text-decoration:none;flex-shrink:0;padding:5px 8px;border-radius:6px;transition:background 120ms" onmouseover="this.style.background='rgba(124,92,46,0.1)'" onmouseout="this.style.background='transparent'">יציאה</a>
+  {% endif %}
 </div>
 
 <div class="shell">
