@@ -514,20 +514,26 @@ async def admin_remove_admin(request: Request, admin_id: int):
 
 @app.post("/admin/init")
 async def init_super_admin(request: Request):
-    with get_db() as conn:
+    import traceback
+    try:
+        data = await request.json()
+        username = data.get("username", "").strip()
+        password = data.get("password", "")
+        if not username or not password:
+            return JSONResponse({"error": "חסרים פרטים"}, status_code=400)
+        conn = get_db()
         count = conn.execute("SELECT COUNT(*) as cnt FROM admins").fetchone()["cnt"]
         if count > 0:
-            raise HTTPException(status_code=403, detail="כבר קיים אדמין במערכת")
-    data = await request.json()
-    username = data.get("username", "").strip()
-    password = data.get("password", "")
-    if not username or not password:
-        raise HTTPException(status_code=400, detail="חסרים פרטים")
-    hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
-    with get_db() as conn:
+            conn.close()
+            return JSONResponse({"error": "כבר קיים אדמין במערכת"}, status_code=403)
+        hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
         conn.execute("INSERT INTO admins (username, password_hash, is_super) VALUES (?,?,1)",
                      (username, hashed))
-    return JSONResponse({"ok": True, "message": f"אדמין ראשי '{username}' נוצר בהצלחה"})
+        conn.commit()
+        conn.close()
+        return JSONResponse({"ok": True, "message": f"אדמין ראשי '{username}' נוצר בהצלחה"})
+    except Exception:
+        return JSONResponse({"error": traceback.format_exc()}, status_code=500)
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
