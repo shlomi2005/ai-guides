@@ -167,8 +167,8 @@ body { background: var(--bg); color: var(--t1); font-family: 'Inter', system-ui,
 .toc-stat span:first-child { font-size: 0.9rem; }
 
 /* ── Reactions bar ── */
-.reactions-bar { position: fixed; bottom: 0; right: 0; left: 0; z-index: 50; padding: 12px 0 16px; pointer-events: none; display: flex; justify-content: center; }
-.reactions-inner { pointer-events: all; display: flex; gap: 4px; align-items: center; background: rgba(245,239,228,0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border2); border-radius: 32px; padding: 6px 10px; box-shadow: 0 4px 32px rgba(80,50,20,0.2), 0 1px 4px rgba(80,50,20,0.1); }
+.reactions-bar { position: fixed; bottom: 0; right: 0; left: 0; z-index: 50; padding: 10px 0 calc(14px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(to top, rgba(232,220,203,1) 55%, transparent 100%); display: flex; justify-content: center; }
+.reactions-inner { display: flex; gap: 4px; align-items: center; background: rgba(245,239,228,0.97); border: 1px solid var(--border2); border-radius: 32px; padding: 6px 10px; box-shadow: 0 4px 24px rgba(80,50,20,0.18); }
 .r-btn { display: flex; align-items: center; gap: 4px; background: transparent; border: 1px solid transparent; border-radius: 20px; padding: 5px 10px; font-size: 0.95rem; cursor: pointer; color: var(--t1); transition: background 120ms, border-color 120ms, transform 100ms; }
 .r-btn:hover { background: var(--card2); border-color: var(--border); transform: scale(1.1); }
 .r-btn:active { transform: scale(0.93); }
