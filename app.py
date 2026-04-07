@@ -144,6 +144,7 @@ def _migrate():
             "ALTER TABLE guides ADD COLUMN view_count INTEGER DEFAULT 0",
             "ALTER TABLE admins ADD COLUMN avatar TEXT DEFAULT ''",
             "ALTER TABLE guides ADD COLUMN category TEXT DEFAULT ''",
+            "ALTER TABLE users ADD COLUMN last_seen TEXT",
             """CREATE TABLE IF NOT EXISTS allowed_editors (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 email TEXT UNIQUE NOT NULL,
@@ -419,6 +420,12 @@ async def index(request: Request):
             ).fetchall()
             all_reactions[g["id"]] = {r["emoji"]: r["cnt"] for r in rows}
         member_count = conn.execute("SELECT COUNT(*) as cnt FROM users").fetchone()["cnt"]
+        # Update last_seen for Google users
+        if user and not user.get("is_admin") and user.get("id"):
+            try:
+                conn.execute("UPDATE users SET last_seen=datetime('now') WHERE id=?", (int(user["id"]),))
+            except Exception:
+                pass
         # Count per category for sidebar badges
         cat_counts = {row["category"]: row["cnt"] for row in conn.execute(
             "SELECT category, COUNT(*) as cnt FROM guides WHERE is_published=1 GROUP BY category"
@@ -450,6 +457,11 @@ async def view_guide(request: Request, guide_id: int):
         if not guide:
             raise HTTPException(status_code=404, detail="מדריך לא נמצא")
         conn.execute("UPDATE guides SET view_count = view_count + 1 WHERE id=?", (guide_id,))
+        if user and not user.get("is_admin") and user.get("id"):
+            try:
+                conn.execute("UPDATE users SET last_seen=datetime('now') WHERE id=?", (int(user["id"]),))
+            except Exception:
+                pass
 
         files = conn.execute(
             "SELECT * FROM guide_files WHERE guide_id=? ORDER BY display_order",
@@ -589,8 +601,15 @@ async def admin_dashboard(request: Request):
             FROM guides g LEFT JOIN admins a ON g.created_by=a.id
             ORDER BY g.created_at DESC
         """).fetchall()
+        stats = {
+            "total_users":   conn.execute("SELECT COUNT(*) as c FROM users").fetchone()["c"],
+            "online_now":    conn.execute("SELECT COUNT(*) as c FROM users WHERE last_seen > datetime('now','-10 minutes')").fetchone()["c"],
+            "today_active":  conn.execute("SELECT COUNT(*) as c FROM users WHERE last_seen > datetime('now','start of day')").fetchone()["c"],
+            "total_views":   conn.execute("SELECT COALESCE(SUM(view_count),0) as c FROM guides WHERE is_published=1").fetchone()["c"],
+            "total_guides":  conn.execute("SELECT COUNT(*) as c FROM guides WHERE is_published=1").fetchone()["c"],
+        }
     return templates.TemplateResponse("admin/dashboard.html", {
-        "request": request, "admin": actor, "guides": guides
+        "request": request, "admin": actor, "guides": guides, "stats": stats
     })
 
 @app.get("/admin/new", response_class=HTMLResponse)

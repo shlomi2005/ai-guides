@@ -161,13 +161,24 @@ html, body {
   .sidebar { display: none; }
   .main { margin-right: 0; padding: 20px 16px 60px; }
 }
+
+/* Bookmarks section */
+.bm-section { margin-bottom: 22px; }
+.bm-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.bm-title { font-size: 0.75rem; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: 0.07em; }
+.bm-clear { font-size: 0.7rem; color: var(--t3); background: none; border: none; cursor: pointer; padding: 2px 6px; border-radius: 5px; font-family: inherit; }
+.bm-clear:hover { background: var(--card2); color: var(--acc); }
+.bm-list { display: flex; flex-direction: column; gap: 5px; }
+.bm-row { display: flex; align-items: center; gap: 10px; padding: 9px 13px; background: var(--card); border: 1px solid var(--border); border-radius: 9px; text-decoration: none; color: var(--t2); font-size: 0.8125rem; font-weight: 500; transition: background 120ms; }
+.bm-row:hover { background: #faf6ef; color: var(--t1); }
+.bm-icon { font-size: 0.8rem; opacity: 0.5; flex-shrink: 0; }
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <a class="t-logo" href="/">
-    <div class="t-logo-mark">🤖</div>
+    <div class="t-logo-mark" style="font-size:0.7rem;font-weight:800;color:#fff;letter-spacing:-0.03em">AI</div>
     <span class="t-logo-text">מדריכי AI</span>
   </a>
   <div class="t-search">
@@ -222,13 +233,22 @@ html, body {
       <div class="page-sub">מדריכים מקצועיים לבינה מלאכותית</div>
     </div>
 
+    <!-- Bookmarks (filled by JS from localStorage) -->
+    <div class="bm-section" id="bmSection" style="display:none">
+      <div class="bm-header">
+        <span class="bm-title">★ מדריכים שמורים</span>
+        <button class="bm-clear" onclick="clearBookmarks()">נקה הכל</button>
+      </div>
+      <div class="bm-list" id="bmList"></div>
+    </div>
+
     {% if guides %}
     <div class="feed" id="feed">
       {% for g in guides %}
       <a class="feed-row" href="/guide/{{ g.id }}" data-title="{{ g.title }}">
         <div class="feed-thumb">
           {% if g.cover_image %}<img src="/files/{{ g.cover_image }}" alt="">
-          {% else %}🤖{% endif %}
+          {% else %}<span style="font-size:1.3rem;opacity:0.25">📄</span>{% endif %}
         </div>
         <div class="feed-body">
           <div class="feed-title">{{ g.title }}</div>
@@ -265,6 +285,25 @@ function search(q) {
     r.style.display = (!q || r.dataset.title.toLowerCase().includes(q)) ? '' : 'none';
   });
 }
+
+// Bookmarks
+const BM_KEY = 'ai_bookmarks_v2';
+function getBookmarks() { try { return JSON.parse(localStorage.getItem(BM_KEY) || '[]'); } catch(e) { return []; } }
+function renderBookmarks() {
+  const bm = getBookmarks();
+  const section = document.getElementById('bmSection');
+  const list = document.getElementById('bmList');
+  if (!bm.length) { section.style.display = 'none'; return; }
+  section.style.display = '';
+  list.innerHTML = bm.map(b =>
+    `<a class="bm-row" href="${b.url}"><span class="bm-icon">★</span>${b.title}</a>`
+  ).join('');
+}
+function clearBookmarks() {
+  localStorage.removeItem(BM_KEY);
+  renderBookmarks();
+}
+renderBookmarks();
 </script>
 </body>
 </html>

@@ -190,7 +190,7 @@ body { background: var(--bg); color: var(--t1); font-family: 'Inter', system-ui,
 <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
 
 <div class="topbar">
-  <a class="t-logo" href="/"><div class="t-logo-mark">🤖</div><span class="t-logo-text">מדריכי AI</span></a>
+  <a class="t-logo" href="/"><div class="t-logo-mark" style="font-size:0.7rem;font-weight:800;color:#fff;letter-spacing:-0.03em">AI</div><span class="t-logo-text">מדריכי AI</span></a>
   <div class="t-sep"></div>
   <a class="t-back" href="/">← חזרה</a>
   <div class="t-sep"></div>
@@ -205,7 +205,7 @@ body { background: var(--bg); color: var(--t1); font-family: 'Inter', system-ui,
   {% if guide.cover_image %}
   <img class="hero-img" src="/files/{{ guide.cover_image }}" alt="{{ guide.title }}">
   {% else %}
-  <div class="hero-placeholder">🤖</div>
+  <div class="hero-placeholder" style="font-size:3rem;opacity:0.2">📄</div>
   {% endif %}
   <div class="hero-scrim"></div>
   <div class="hero-body">
@@ -276,7 +276,7 @@ body { background: var(--bg); color: var(--t1); font-family: 'Inter', system-ui,
         <a class="related-card" href="/guide/{{ r.id }}">
           <div class="related-thumb">
             {% if r.cover_image %}<img src="/files/{{ r.cover_image }}" alt="">
-            {% else %}🤖{% endif %}
+            {% else %}<span style="font-size:1.5rem;opacity:0.25">📄</span>{% endif %}
           </div>
           <div class="related-title">{{ r.title }}</div>
         </a>
@@ -289,9 +289,7 @@ body { background: var(--bg); color: var(--t1); font-family: 'Inter', system-ui,
     <div class="toc-col">
       <div class="toc-card">
         <div class="toc-title">תוכן עניינים</div>
-        <ul class="toc-list" id="tocList">
-          <li class="toc-empty">טוען...</li>
-        </ul>
+        <ul class="toc-list" id="tocList"></ul>
         <div class="toc-divider"></div>
         <div class="toc-stats">
           {% if guide.view_count %}
@@ -371,8 +369,9 @@ window.addEventListener('scroll', () => {
 function buildTOC() {
   const body = document.getElementById('bodyText');
   const list = document.getElementById('tocList');
+  const card = document.querySelector('.toc-card');
   const heads = body.querySelectorAll('h2, h3');
-  if (!heads.length) { list.innerHTML = '<li class="toc-empty">אין פרקים</li>'; return; }
+  if (!heads.length) { if (card) card.style.display = 'none'; return; }
   list.innerHTML = '';
   heads.forEach((h, i) => {
     if (!h.id) h.id = 'section-' + i;
@@ -394,21 +393,30 @@ const observer = new IntersectionObserver(entries => {
 }, { rootMargin: '-60px 0px -70% 0px', threshold: 0 });
 document.querySelectorAll('.body-text h2, .body-text h3').forEach(h => observer.observe(h));
 
-// Bookmark
-const BOOKMARKS_KEY = 'ai_bookmarks';
-function getBookmarks() { return JSON.parse(localStorage.getItem(BOOKMARKS_KEY) || '[]'); }
+// Bookmark (stores objects: {id, title, url})
+const BOOKMARKS_KEY = 'ai_bookmarks_v2';
+function getBookmarks() { try { return JSON.parse(localStorage.getItem(BOOKMARKS_KEY) || '[]'); } catch(e) { return []; } }
+function isBookmarked() { return getBookmarks().some(b => b.id === guideId); }
 function updateBookmarkBtn(saved) {
   const btn = document.getElementById('bookmarkBtn');
+  if (!btn) return;
   btn.textContent = saved ? '★ נשמר' : '☆ שמור';
   btn.classList.toggle('bookmarked', saved);
 }
 function toggleBookmark() {
-  const bm = getBookmarks(), idx = bm.indexOf(guideId);
-  if (idx === -1) { bm.push(guideId); toast('נשמר לסימניות ★'); updateBookmarkBtn(true); }
-  else { bm.splice(idx, 1); updateBookmarkBtn(false); }
+  let bm = getBookmarks();
+  const idx = bm.findIndex(b => b.id === guideId);
+  if (idx === -1) {
+    bm.push({ id: guideId, title: '{{ guide.title | e }}', url: window.location.href });
+    toast('נשמר לסימניות ★');
+    updateBookmarkBtn(true);
+  } else {
+    bm.splice(idx, 1);
+    updateBookmarkBtn(false);
+  }
   localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(bm));
 }
-updateBookmarkBtn(getBookmarks().includes(guideId));
+updateBookmarkBtn(isBookmarked());
 
 // Copy link
 function copyLink() {

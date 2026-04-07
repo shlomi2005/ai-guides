@@ -29,8 +29,9 @@ html, body { background: var(--bg); color: var(--t1);
 .t-logo-mark {
   width: 28px; height: 28px; border-radius: 7px;
   background: linear-gradient(135deg, var(--acc), var(--acc-h));
-  display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
 }
+.t-logo-mark span { font-size: 0.7rem; font-weight: 800; color: #fff; letter-spacing: -0.03em; }
 .t-logo-text { font-size: 0.875rem; font-weight: 700; color: var(--t1); }
 .t-sep { width: 1px; height: 18px; background: var(--border2); flex-shrink: 0; }
 .t-crumb { font-size: 0.8125rem; color: var(--t3); }
@@ -93,13 +94,22 @@ td { padding: 13px 16px; font-size: 0.8125rem; vertical-align: middle; }
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+.stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 24px; }
+.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; box-shadow: var(--shadow-sm); }
+.stat-val { font-size: 1.5rem; font-weight: 800; color: var(--t1); letter-spacing: -0.03em; line-height: 1; margin-bottom: 5px; }
+.stat-val.online { color: #3a9c56; }
+.stat-lbl { font-size: 0.7rem; font-weight: 600; color: var(--t3); text-transform: uppercase; letter-spacing: 0.06em; }
+.stat-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #3a9c56; margin-left: 5px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+@media (max-width: 700px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <a class="t-logo" href="/">
-    <div class="t-logo-mark">🤖</div>
+    <div class="t-logo-mark"><span>AI</span></div>
     <span class="t-logo-text">מדריכי AI</span>
   </a>
   <div class="t-sep"></div>
@@ -114,6 +124,31 @@ td { padding: 13px 16px; font-size: 0.8125rem; vertical-align: middle; }
 </div>
 
 <div class="main">
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-val online"><span class="stat-dot"></span>{{ stats.online_now }}</div>
+      <div class="stat-lbl">מחוברים כרגע</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">{{ stats.today_active }}</div>
+      <div class="stat-lbl">פעילים היום</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">{{ stats.total_users }}</div>
+      <div class="stat-lbl">סה"כ חברים</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">{{ stats.total_views }}</div>
+      <div class="stat-lbl">סה"כ צפיות</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">{{ stats.total_guides }}</div>
+      <div class="stat-lbl">מדריכים פורסמו</div>
+    </div>
+  </div>
+
   <div class="page-head">
     <div>
       <div class="page-h">מדריכים</div>
