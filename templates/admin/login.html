@@ -3,40 +3,73 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>כניסת אדמין</title>
+<title>כניסת מנהל — מדריכי AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: #0d0d0d; color: #f0f0f0; font-family: 'Segoe UI', Arial, sans-serif;
-  min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-.box { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 16px; padding: 40px; width: 360px; }
-.logo { font-size: 1.4rem; font-weight: 800; color: #6c63ff; text-align: center; margin-bottom: 8px; }
-.subtitle { text-align: center; color: #888; font-size: 0.85rem; margin-bottom: 32px; }
-label { display: block; font-size: 0.85rem; color: #888; margin-bottom: 6px; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0a0f; --s1: #111118; --s2: #18181f; --s3: #1e1e28;
+  --b0: rgba(255,255,255,0.05); --b1: rgba(255,255,255,0.09); --b2: rgba(255,255,255,0.18);
+  --acc: #c4a882; --acc-h: #d4bc9a;
+  --t1: #f0ede8; --t2: #8a8a9a; --t3: #55556a;
+}
+html, body {
+  background: var(--bg); color: var(--t1);
+  font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+}
+.box {
+  background: var(--s1); border: 1px solid var(--b1);
+  border-radius: 16px; padding: 40px 36px; width: 360px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+}
+.logo-wrap { text-align: center; margin-bottom: 28px; }
+.logo-mark {
+  width: 44px; height: 44px; border-radius: 11px;
+  background: linear-gradient(135deg, #2a2030, #3d2f50);
+  border: 1px solid rgba(196,168,130,0.25);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1.25rem; margin-bottom: 12px;
+}
+.logo-text { font-size: 1.0625rem; font-weight: 700; color: var(--t1); display: block; }
+.logo-sub { font-size: 0.8125rem; color: var(--t3); margin-top: 3px; }
+label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--t3); letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 7px; }
 input {
-  width: 100%; background: #111; border: 1px solid #333; border-radius: 8px;
-  padding: 12px 14px; color: #f0f0f0; font-size: 0.95rem; margin-bottom: 20px;
-  outline: none; transition: .2s;
+  width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--b1);
+  border-radius: 8px; padding: 10px 14px; color: var(--t1);
+  font-size: 0.875rem; font-family: inherit; outline: none;
+  transition: border-color 150ms, box-shadow 150ms; margin-bottom: 18px;
 }
-input:focus { border-color: #6c63ff; }
+input:focus { border-color: var(--b2); box-shadow: 0 0 0 3px rgba(196,168,130,0.1); }
+input::placeholder { color: var(--t3); }
 button {
-  width: 100%; background: #6c63ff; border: none; border-radius: 8px;
-  padding: 13px; color: #fff; font-size: 1rem; font-weight: 700; cursor: pointer; transition: .2s;
+  width: 100%; background: var(--acc); border: none; border-radius: 8px;
+  padding: 11px; color: #0a0a0f; font-size: 0.875rem; font-weight: 600;
+  font-family: inherit; cursor: pointer; transition: background 150ms, transform 150ms;
 }
-button:hover { background: #8b85ff; }
-.error { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); border-radius: 8px;
-  padding: 10px 14px; color: #f87171; font-size: 0.85rem; margin-bottom: 20px; }
+button:hover { background: var(--acc-h); }
+button:active { transform: scale(0.98); }
+.error {
+  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 8px; padding: 10px 14px; color: #f87171;
+  font-size: 0.8125rem; margin-bottom: 18px;
+}
 </style>
 </head>
 <body>
 <div class="box">
-  <div class="logo">🤖 מדריכי AI</div>
-  <div class="subtitle">כניסת מנהל מערכת</div>
+  <div class="logo-wrap">
+    <div class="logo-mark">🤖</div>
+    <span class="logo-text">מדריכי AI</span>
+    <div class="logo-sub">כניסת מנהל מערכת</div>
+  </div>
   {% if error %}<div class="error">{{ error }}</div>{% endif %}
   <form method="post">
     <label>שם משתמש</label>
-    <input name="username" type="text" autocomplete="username" autofocus required>
+    <input name="username" type="text" autocomplete="username" autofocus required placeholder="הזן שם משתמש">
     <label>סיסמה</label>
-    <input name="password" type="password" autocomplete="current-password" required>
+    <input name="password" type="password" autocomplete="current-password" required placeholder="הזן סיסמה">
     <button type="submit">כניסה</button>
   </form>
 </div>

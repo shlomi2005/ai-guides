@@ -3,90 +3,172 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ניהול אדמינים</title>
+<title>ניהול אדמינים — מדריכי AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-* { box-sizing:border-box; margin:0; padding:0; }
-:root { --bg:#0d0d0d; --card:#1a1a1a; --card2:#222; --border:#2a2a2a; --accent:#6c63ff; --text:#f0f0f0; --sub:#888; }
-body { background:var(--bg); color:var(--text); font-family:'Segoe UI',Arial,sans-serif; min-height:100vh; }
-header { background:linear-gradient(135deg,#111,#1a1030); border-bottom:2px solid var(--accent); padding:16px 32px; display:flex; align-items:center; gap:20px; }
-.back { color:var(--sub); text-decoration:none; font-size:0.9rem; }
-.back:hover { color:var(--accent); }
-.logo { font-size:1.2rem; font-weight:800; color:var(--accent); }
-main { max-width:700px; margin:0 auto; padding:40px 20px; }
-.page-title { font-size:1.5rem; font-weight:800; margin-bottom:32px; }
-.admin-row { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:16px; margin-bottom:10px; }
-.admin-name { flex:1; font-weight:700; }
-.admin-role { font-size:0.75rem; padding:3px 10px; border-radius:10px; }
-.role-super { background:rgba(108,99,255,.15); color:var(--accent); border:1px solid rgba(108,99,255,.3); }
-.role-admin { background:var(--card2); color:var(--sub); border:1px solid var(--border); }
-.btn-remove { background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.2); color:#f87171; border-radius:8px; padding:6px 14px; font-size:0.8rem; cursor:pointer; }
-.btn-remove:hover { background:rgba(239,68,68,.2); }
-.add-form { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px; margin-top:32px; }
-.add-form h3 { margin-bottom:20px; font-size:1rem; color:var(--sub); }
-.form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
-input[type=text], input[type=password] {
-  width:100%; background:#111; border:1px solid var(--border); border-radius:8px;
-  padding:10px 14px; color:var(--text); font-size:0.9rem; outline:none; transition:.2s;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0a0f; --s1: #111118; --s2: #18181f; --s3: #1e1e28;
+  --b0: rgba(255,255,255,0.05); --b1: rgba(255,255,255,0.09); --b2: rgba(255,255,255,0.18);
+  --acc: #c4a882; --acc-h: #d4bc9a;
+  --t1: #f0ede8; --t2: #8a8a9a; --t3: #55556a;
 }
-input:focus { border-color:var(--accent); }
-.toggle-group { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
-.toggle { position:relative; width:44px; height:24px; }
-.toggle input { opacity:0; width:0; height:0; }
-.slider { position:absolute; inset:0; background:#333; border-radius:12px; cursor:pointer; transition:.2s; }
-.slider:before { content:''; position:absolute; width:18px; height:18px; bottom:3px; right:3px; background:#fff; border-radius:50%; transition:.2s; }
-.toggle input:checked + .slider { background:var(--accent); }
-.toggle input:checked + .slider:before { transform:translateX(-20px); }
-.btn-add { background:var(--accent); border:none; border-radius:8px; padding:10px 24px; color:#fff; font-size:0.9rem; font-weight:700; cursor:pointer; transition:.2s; }
-.btn-add:hover { background:#8b85ff; }
-.error { background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.2); color:#f87171; border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:0.85rem; }
-.success { background:rgba(34,197,94,.1); border:1px solid rgba(34,197,94,.2); color:#22c55e; border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:0.85rem; }
+html, body { background: var(--bg); color: var(--t1);
+  font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+
+/* Topbar */
+.topbar {
+  position: sticky; top: 0; z-index: 100; height: 52px;
+  background: rgba(10,10,15,0.9); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--b0);
+  display: flex; align-items: center; padding: 0 24px; gap: 12px;
+}
+.t-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; flex-shrink: 0; }
+.t-logo-mark {
+  width: 26px; height: 26px; border-radius: 6px;
+  background: linear-gradient(135deg, #2a2030, #3d2f50);
+  border: 1px solid rgba(196,168,130,0.2);
+  display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+}
+.t-logo-text { font-size: 0.8125rem; font-weight: 600; color: var(--t1); }
+.t-sep { width: 1px; height: 18px; background: var(--b1); flex-shrink: 0; }
+.t-back { display: flex; align-items: center; gap: 6px; color: var(--t2); text-decoration: none;
+  font-size: 0.8125rem; font-weight: 500; padding: 5px 10px; border-radius: 6px;
+  transition: background 120ms, color 120ms; }
+.t-back:hover { background: var(--s3); color: var(--t1); }
+.t-crumb { font-size: 0.8125rem; color: var(--t3); }
+
+/* Main */
+.main { max-width: 680px; margin: 0 auto; padding: 40px 24px 80px; }
+.page-h { font-size: 1rem; font-weight: 600; color: var(--t1); margin-bottom: 24px; }
+
+/* Banners */
+.banner-success {
+  background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2);
+  color: #4ade80; border-radius: 9px; padding: 11px 16px; font-size: 0.8125rem; margin-bottom: 20px;
+}
+.banner-error {
+  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
+  color: #f87171; border-radius: 9px; padding: 11px 16px; font-size: 0.8125rem; margin-bottom: 20px;
+}
+
+/* Admin rows */
+.admin-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 36px; }
+.admin-row {
+  background: var(--s1); border: 1px solid var(--b0); border-radius: 9px;
+  padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+}
+.admin-name { flex: 1; font-size: 0.875rem; font-weight: 500; color: var(--t1); }
+.role-badge { font-size: 0.6875rem; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+.role-super { background: rgba(196,168,130,0.12); color: var(--acc); border: 1px solid rgba(196,168,130,0.25); }
+.role-admin { background: var(--s2); color: var(--t3); border: 1px solid var(--b0); }
+.admin-date { font-size: 0.75rem; color: var(--t3); }
+.btn-remove {
+  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
+  color: #f87171; border-radius: 6px; padding: 5px 12px; font-size: 0.75rem;
+  cursor: pointer; font-family: inherit; transition: background 120ms;
+}
+.btn-remove:hover { background: rgba(239,68,68,0.15); }
+
+/* Add form */
+.add-card {
+  background: var(--s1); border: 1px solid var(--b0); border-radius: 12px; padding: 24px;
+}
+.add-card-title { font-size: 0.875rem; font-weight: 600; color: var(--t1); margin-bottom: 20px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+label { display: block; font-size: 0.6875rem; font-weight: 600; color: var(--t3);
+  letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 7px; }
+input[type=text], input[type=password] {
+  width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--b1);
+  border-radius: 8px; padding: 10px 13px; color: var(--t1);
+  font-size: 0.875rem; font-family: inherit; outline: none;
+  transition: border-color 150ms, box-shadow 150ms;
+}
+input:focus { border-color: var(--b2); box-shadow: 0 0 0 3px rgba(196,168,130,0.08); }
+input::placeholder { color: var(--t3); }
+.toggle-group { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; inset: 0; background: var(--s3); border-radius: 12px; cursor: pointer; transition: background 150ms; border: 1px solid var(--b1); }
+.slider:before { content: ''; position: absolute; width: 18px; height: 18px; bottom: 2px; right: 2px; background: var(--t3); border-radius: 50%; transition: transform 150ms, background 150ms; }
+.toggle input:checked + .slider { background: rgba(196,168,130,0.2); border-color: rgba(196,168,130,0.4); }
+.toggle input:checked + .slider:before { transform: translateX(-20px); background: var(--acc); }
+.toggle-label { font-size: 0.875rem; color: var(--t2); }
+.btn-add {
+  background: var(--acc); border: none; border-radius: 8px;
+  padding: 10px 24px; color: #0a0a0f; font-size: 0.875rem; font-weight: 600;
+  font-family: inherit; cursor: pointer; transition: background 150ms, transform 150ms;
+}
+.btn-add:hover { background: var(--acc-h); }
+.btn-add:active { transform: scale(0.98); }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--b1); border-radius: 3px; }
 </style>
 </head>
 <body>
-<header>
-  <a class="back" href="/admin/">← לוח בקרה</a>
-  <div class="logo">🤖 ניהול אדמינים</div>
-</header>
-<main>
-  <div class="page-title">אדמינים ({{ admins|length }})</div>
 
-  {% if request.query_params.get('added') %}<div class="success">✅ אדמין נוסף בהצלחה</div>{% endif %}
-  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+<div class="topbar">
+  <a class="t-logo" href="/">
+    <div class="t-logo-mark">🤖</div>
+    <span class="t-logo-text">מדריכי AI</span>
+  </a>
+  <div class="t-sep"></div>
+  <a class="t-back" href="/admin/">← לוח בקרה</a>
+  <div class="t-sep"></div>
+  <span class="t-crumb">ניהול אדמינים</span>
+</div>
 
-  {% for a in admins %}
-  <div class="admin-row">
-    <span class="admin-name">👤 {{ a.username }}</span>
-    {% if a.is_super %}
-    <span class="admin-role role-super">אדמין ראשי</span>
-    {% else %}
-    <span class="admin-role role-admin">אדמין</span>
-    {% endif %}
-    <span style="font-size:0.75rem;color:var(--sub)">{{ a.created_at[:10] }}</span>
-    {% if not a.is_super or admins|length > 1 %}
-    <form method="post" action="/admin/admins/remove/{{ a.id }}" onsubmit="return confirm('להסיר אדמין זה?')">
-      <button type="submit" class="btn-remove">הסר</button>
-    </form>
-    {% endif %}
+<div class="main">
+  <div class="page-h">אדמינים ({{ admins|length }})</div>
+
+  {% if request.query_params.get('added') %}<div class="banner-success">אדמין נוסף בהצלחה</div>{% endif %}
+  {% if error %}<div class="banner-error">{{ error }}</div>{% endif %}
+
+  <div class="admin-list">
+    {% for a in admins %}
+    <div class="admin-row">
+      <span class="admin-name">{{ a.username }}</span>
+      {% if a.is_super %}
+      <span class="role-badge role-super">ראשי</span>
+      {% else %}
+      <span class="role-badge role-admin">אדמין</span>
+      {% endif %}
+      <span class="admin-date">{{ a.created_at[:10] }}</span>
+      {% if not a.is_super or admins|length > 1 %}
+      <form method="post" action="/admin/admins/remove/{{ a.id }}" onsubmit="return confirm('להסיר אדמין זה?')">
+        <button type="submit" class="btn-remove">הסר</button>
+      </form>
+      {% endif %}
+    </div>
+    {% endfor %}
   </div>
-  {% endfor %}
 
-  <div class="add-form">
-    <h3>➕ הוספת אדמין חדש</h3>
+  <div class="add-card">
+    <div class="add-card-title">הוספת אדמין חדש</div>
     <form method="post" action="/admin/admins/add">
       <div class="form-row">
-        <input type="text" name="username" placeholder="שם משתמש" required>
-        <input type="password" name="password" placeholder="סיסמה" required>
+        <div>
+          <label>שם משתמש</label>
+          <input type="text" name="username" placeholder="שם משתמש" required>
+        </div>
+        <div>
+          <label>סיסמה</label>
+          <input type="password" name="password" placeholder="סיסמה" required>
+        </div>
       </div>
       <div class="toggle-group">
         <label class="toggle">
           <input type="checkbox" name="is_super" value="1">
           <span class="slider"></span>
         </label>
-        <span style="font-size:0.85rem">אדמין ראשי (יכול לנהל אדמינים)</span>
+        <span class="toggle-label">אדמין ראשי (יכול לנהל אדמינים)</span>
       </div>
       <button type="submit" class="btn-add">הוסף אדמין</button>
     </form>
   </div>
-</main>
+</div>
 </body>
 </html>
